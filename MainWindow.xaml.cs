@@ -39,6 +39,8 @@ namespace Dahmira
 
         int oldCurrentProductIndex = 0; //Прошлый выбранный элемент в dataBaseGrid
 
+        ObservableCollection<TestData> items;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -48,7 +50,7 @@ namespace Dahmira
             try
             {
                 //Пробное наполнение dataBaseGrid 
-                ObservableCollection<TestData> items = new ObservableCollection<TestData>()
+                items = new ObservableCollection<TestData>()
                 {
                     new TestData { Manufacturer = "AcoFunki", ProductName = "ПЛАСТИКОВАЯ ПЛАНКА 60X40 СМ ДЛЯ СВИНОМАТОК, 50% ОТКРЫТИЕ ПЛАСТИКОВЫЙ ПОЛ", Unit = "шт.", Article = "9102", Cost = "12.2500" },
                     new TestData { Manufacturer = "Azud", ProductName = "Filter 2", Article = "DF 1", Unit = "шт.", Cost = "50,0000" },
@@ -59,8 +61,8 @@ namespace Dahmira
                     new TestData { Manufacturer = "Fancom", ProductName = "Птицеводческий компьютер для напольного содержания, 8 зон, шт.", Unit = "шт.", Article = "F38", Cost = "3835,2000" },
                     new TestData { Manufacturer = "Gasolec", ProductName = "Источник постоянного тока 48В,  (DC), макс. 320Вт, шт. ", Article = "PLP32048", Unit = "шт.", Cost = "86,9000" },
                     new TestData { Manufacturer = "HS", ProductName = "Pad colling price for KIT L=1000, H is different, NOTE!!! typical length = 3 m", Article = "Cl.FR1m", Unit = "метр", Cost = "20,0000" },
-                    new TestData { Manufacturer = "Jomapeks", ProductName = " Металлический бункер с дном из нержавеющей стали. 120 кг и трансмиссия без микровыключателя", Article = "010 325", Unit = "шт.", Cost = "93,0000" },
-                    new TestData { Manufacturer = "Jomapeks", ProductName = " Металлический бункер с дном из нержавеющей стали. 120 кг и трансмиссия без микровыключателя", Article = "010 325", Unit = "шт.", Cost = "93,0000" }
+                    new TestData { Manufacturer = "Jomapeks", ProductName = "Металлический бункер с дном из нержавеющей стали. 120 кг и трансмиссия без микровыключателя", Article = "010 325", Unit = "шт.", Cost = "93,0000" },
+                    new TestData { Manufacturer = "Jomapeks", ProductName = "Металлический бункер с дном из нержавеющей стали. 120 кг и трансмиссия без микровыключателя", Article = "010 325", Unit = "шт.", Cost = "93,0000" }
                 };
                 foreach (var item in items)
                 {
@@ -72,8 +74,7 @@ namespace Dahmira
                 //Пробное получение всех производителей
                 IEnumerable itemsSource = dataBaseGrid.Items;
 
-                List<string> firstColumnValues = itemsSource
-                                                .Cast<TestData>()
+                List<string> firstColumnValues = itemsSource.Cast<TestData>()
                                                 .Select(item => item.Manufacturer)
                                                 .Distinct()
                                                 .ToList();
@@ -84,6 +85,12 @@ namespace Dahmira
                 }
 
                 Manufacturer_comboBox.ItemsSource = CountryManager.Instance.allManufacturers;
+
+                ProductName_comboBox.ItemsSource = items;
+                Article_comboBox.ItemsSource = items;
+                Unit_comboBox.ItemsSource = items;
+                Cost_comboBox.ItemsSource = items; 
+
             }
             catch (Exception e) { MessageBox.Show(e.Message); }
         }
@@ -286,7 +293,9 @@ namespace Dahmira
                 Cost = newCost_textBox.Text,
             };
 
-            if (addedProductImage.Source.ToString() != "resources/images/without_picture.png") //Если картинка изменилась
+            MessageBox.Show(addedProductImage.Source.ToString());
+
+            if (addedProductImage.Source.ToString() != "pack://application:,,,/resources/images/without_picture.png") //Если картинка изменилась
             {
                 //Конвертация из Image в массив байтов
                 ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services();
@@ -295,6 +304,7 @@ namespace Dahmira
             }
 
             //Добавление
+            items.Add(newPrice);
             dataBaseGrid.Items.Add(newPrice);
             productsCount_label.Content = "из " + dataBaseGrid.Items.Count.ToString();
 
@@ -305,8 +315,6 @@ namespace Dahmira
             newUnit_textBox.Clear();
             newCost_textBox.Clear();
             addedProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
-
-            CountryManager.Instance.allManufacturers.Add(new Manufacturer { name = newPrice.Manufacturer });
         }
 
         private void deleteSelectedProduct_button_Click(object sender, RoutedEventArgs e) //Удаление выделенного элемента прайса

@@ -349,7 +349,8 @@
                         Height="24" Width="156" 
                         Foreground="Gray" FontSize="14" Grid.Row="2" HorizontalContentAlignment="Right"/>
 
-                    <ComboBox Grid.Row="2" VerticalAlignment="Center" Grid.Column="1" Width="Auto" Height="19" Grid.ColumnSpan="6"/>
+                    <ComboBox x:Name ="ProductName_comboBox" DisplayMemberPath="ProductName"
+                              Grid.Row="2" VerticalAlignment="Center" Grid.Column="1" Width="Auto" Height="19" Grid.ColumnSpan="6"/>
 
                     <Label Content="АРТИКУЛ:" 
                         HorizontalAlignment="Center" 
@@ -358,7 +359,8 @@
                         Height="24" Width="156" 
                         Foreground="Gray" FontSize="14" Grid.Row="3" HorizontalContentAlignment="Right"/>
 
-                    <ComboBox Grid.Row="3" VerticalAlignment="Center" Grid.Column="1" Height="19"/>
+                    <ComboBox x:Name="Article_comboBox" DisplayMemberPath="Article"
+                              Grid.Row="3" VerticalAlignment="Center" Grid.Column="1" Height="19"/>
 
                     <Label Content="ЕД. ИЗМЕРЕНИЯ:" 
                         HorizontalAlignment="Center" 
@@ -367,7 +369,8 @@
                         Height="24" Width="156" 
                         Foreground="Gray" FontSize="14" Grid.Row="3" HorizontalContentAlignment="Right" Grid.Column="2"/>
 
-                    <ComboBox Grid.Row="3" VerticalAlignment="Center" Grid.Column="3" Height="19" Grid.ColumnSpan="4"/>
+                    <ComboBox x:Name="Unit_comboBox" DisplayMemberPath="Unit"
+                              Grid.Row="3" VerticalAlignment="Center" Grid.Column="3" Height="19" Grid.ColumnSpan="4"/>
 
                     <Label Content="ЦЕНА:" 
                         HorizontalAlignment="Center" 
@@ -376,7 +379,8 @@
                         Height="24" Width="156" 
                         Foreground="Gray" FontSize="14" Grid.Row="4" HorizontalContentAlignment="Right"/>
 
-                    <ComboBox Grid.Row="4" VerticalAlignment="Center" Grid.Column="1" Height="19" Grid.ColumnSpan="2" Margin="0,0,127,0"/>
+                    <ComboBox x:Name="Cost_comboBox" DisplayMemberPath="Cost"
+                              Grid.Row="4" VerticalAlignment="Center" Grid.Column="1" Height="19" Grid.ColumnSpan="2" Margin="0,0,127,0"/>
 
                     <Label Content="КОЛИЧЕСТВО:" 
                         HorizontalAlignment="Left" 
