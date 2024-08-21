@@ -10,8 +10,13 @@ namespace Dahmira.Models
     public class Country
     {
         public string name { get; set; }
-        public decimal coefficient { get; set; }
-        public decimal discount { get; set; }
+        public double coefficient { get; set; }
+        public double discount { get; set; }
         public ObservableCollection<Manufacturer> manufacturers { get; set; }
+
+        public Country()
+        {
+            manufacturers = new ObservableCollection<Manufacturer>();
+        }
     }
 }

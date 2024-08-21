@@ -21,21 +21,48 @@ namespace Dahmira.Pages
     /// </summary>
     public partial class SimpleSettings : Window
     {
+        public ObservableCollection<ColorItem> colors { get; set; }
         public SimpleSettings()
         {
             InitializeComponent();
 
             //Заполнение данными CountryDataGrid
             CountryDataGrid.ItemsSource = CountryManager.Instance.countries;
+            colors = new ObservableCollection<ColorItem>
+            {
+                new ColorItem { Name = "Красный", Color = Colors.Red },
+                new ColorItem { Name = "Зелёный", Color = Colors.Green },
+                new ColorItem { Name = "Синий", Color = Colors.Blue },
+                new ColorItem { Name = "Жёлтый", Color = Colors.Yellow },
+                new ColorItem { Name = "Прозрачный", Color = Colors.Transparent }
+            };
+            //Цвета для comboBox, отвечающие за настройку Excel
+            ExcelTitleColors_comboBox.ItemsSource = colors;
+            ExcelChapterColors_comboBox.ItemsSource = colors;
+            ExcelDataColors_comboBox.ItemsSource = colors;
+            ExcelPhotoBackgroundColors_comboBox.ItemsSource = colors;
+            ExcelNotesColors_comboBox.ItemsSource = colors;
+            ExcelNumberColors_comboBox.ItemsSource = colors;
+
+            //Цвета для comboBox, отвечающие за настройку pdf
+            pdfHeaderColors_comboBox.ItemsSource = colors;
+            pdfChapterColors_comboBox.ItemsSource = colors;
+            pdfResultsColors_comboBox.ItemsSource = colors;
         }
 
         private void CountryDataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e) //Отображение поставщиков у выбранной страны
         {
-            Country selectedItem = (Country)CountryDataGrid.SelectedItem;
-            ManufacturerDataGrid.ItemsSource = selectedItem.manufacturers;
+            if(CountryDataGrid.SelectedIndex != CountryDataGrid.Items.Count - 1) 
+            {
+                Country selectedItem = (Country)CountryDataGrid.SelectedItem;
+                if(selectedItem != null) 
+                {
+                    ManufacturerDataGrid.ItemsSource = selectedItem.manufacturers;
 
-            List<Manufacturer> list = CountryManager.Instance.allManufacturers.Except(selectedItem.manufacturers).ToList();
-            WithoutCountryManufacturersDataGrid.ItemsSource = new ObservableCollection<Manufacturer>(list);
+                    List<Manufacturer> list = CountryManager.Instance.allManufacturers.Except(selectedItem.manufacturers).ToList();
+                    WithoutCountryManufacturersDataGrid.ItemsSource = new ObservableCollection<Manufacturer>(list);
+                }
+            }
         }
 
         private void showHide_button_Click(object sender, RoutedEventArgs e) //Показ и скрытие дополнительного dataGrid с производителями без страны
@@ -75,6 +102,26 @@ namespace Dahmira.Pages
             ManufacturerWithoutCountryItemSource.Add(selectedManufacturer);
             //Удаление поставщика из местных поставщиков выбранной страны
             selectedCountry.manufacturers.Remove(selectedManufacturer);
+        }
+
+        private void CountryDataGrid_CurrentCellChanged(object sender, EventArgs e) //Когда заканчивается редактирование текущей ячейки
+        {
+            Country selectedItem = (Country)CountryDataGrid.SelectedItem;
+
+            if (selectedItem != null)
+            {
+                if (selectedItem.discount > 1)
+                {
+                    selectedItem.discount = 1;
+                }
+                if (selectedItem.discount < 0)
+                {
+                    selectedItem.discount = 0;
+                }
+
+                // Обновляем DataGrid после завершения текущего цикла событий
+                CountryDataGrid.Dispatcher.BeginInvoke(new Action(() =>{CountryDataGrid.Items.Refresh();}));
+            }
         }
     }
 }

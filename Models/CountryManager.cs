@@ -18,15 +18,15 @@ namespace Dahmira.Models
             allManufacturers = new ObservableCollection<Manufacturer> { };
             countries = new ObservableCollection<Country>
             {
-                new Country { name = "1x1", coefficient = 1, discount = 1, manufacturers = new ObservableCollection<Manufacturer> { new Manufacturer { name = "AcoFunki" }, new Manufacturer { name = "Azud" } } },
-                new Country { name = "Армения", coefficient = 2, discount = 0.1M, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Beerepoot" }, new Manufacturer { name = "Codaf" } } },
-                new Country { name = "Россия", coefficient = 2, discount = 0.2M, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
-                new Country { name = "Беларусь", coefficient = 1, discount = 0.5M, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
-                new Country { name = "Украина", coefficient = 2, discount = 1.1M, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
-                new Country { name = "2x1", coefficient = 2, discount = 1, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
-                new Country { name = "Польша", coefficient = 2, discount = 0.3M, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
-                new Country { name = "Казахстан", coefficient = 2, discount = 1, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
-                new Country { name = "EXW Wroclaw Poland", coefficient = 1.4M, discount = 1.2M, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
+                new Country { name = "1x1", coefficient = 1, discount = 0, manufacturers = new ObservableCollection<Manufacturer> { new Manufacturer { name = "AcoFunki" }, new Manufacturer { name = "Azud" } } },
+                new Country { name = "Армения", coefficient = 2, discount = 0.1, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Beerepoot" }, new Manufacturer { name = "Codaf" } } },
+                new Country { name = "Россия", coefficient = 2, discount = 0.2, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
+                new Country { name = "Беларусь", coefficient = 1, discount = 0.5, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
+                new Country { name = "Украина", coefficient = 2, discount = 0.1, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
+                new Country { name = "2x1", coefficient = 2, discount = 0, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
+                new Country { name = "Польша", coefficient = 2, discount = 0.3, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
+                new Country { name = "Казахстан", coefficient = 2, discount = 0.5, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
+                new Country { name = "EXW Wroclaw Poland", coefficient = 1.4, discount = 0.2, manufacturers = new ObservableCollection<Manufacturer> {new Manufacturer { name = "Daltec" } } },
             };
         }
 

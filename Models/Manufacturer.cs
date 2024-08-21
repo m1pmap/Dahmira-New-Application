@@ -17,12 +17,12 @@ namespace Dahmira.Models
 
         public bool Equals(Manufacturer other)
         {
-            return other != null && name == other.name; // Сравниваем по имени
+            return other != null && name == other.name; //Сравниваем по имени
         }
 
         public override int GetHashCode()
         {
-            return name.GetHashCode(); // Используем хэш-код имени
+            return name.GetHashCode(); //Используем хэш-код имени
         }
     }
 }

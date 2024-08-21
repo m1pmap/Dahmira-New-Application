@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="refresh.png" />
     <None Remove="resources\images\add.png" />
     <None Remove="resources\images\arrow_left.png" />
     <None Remove="resources\images\delete_image.png" />
@@ -23,10 +24,12 @@
     <None Remove="resources\images\upload_from_file.png" />
     <None Remove="resources\images\without_image_database.png" />
     <None Remove="resources\images\without_picture.png" />
-    <None Remove="search.png" />
+    <None Remove="save.png" />
+    <None Remove="without_image_database.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="refresh.png" />
     <Resource Include="resources\images\add.png" />
     <Resource Include="resources\images\arrow_left.png" />
     <Resource Include="resources\images\delete_image.png" />
@@ -41,7 +44,8 @@
     <Resource Include="resources\images\upload_from_file.png" />
     <Resource Include="resources\images\without_image_database.png" />
     <Resource Include="resources\images\without_picture.png" />
-    <Resource Include="search.png" />
+    <Resource Include="save.png" />
+    <Resource Include="without_image_database.png" />
   </ItemGroup>
 
 </Project>
