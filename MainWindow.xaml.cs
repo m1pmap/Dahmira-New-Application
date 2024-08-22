@@ -21,6 +21,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -35,6 +36,7 @@ namespace Dahmira
     public partial class MainWindow : Window
     {
         private IProductImageUpdating ImageUpdater = new ProductImageUpdating_Services();//Для работы с загрузкой/удалением/сохранением картинки в файл/буфер
+        private ICalcController CalcController = new CalcController_Services();//Для работы с обновлением/добавлением в расчётку
         ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services(); //???Для Конвертации изображения в массив байтов и обратно???
 
         int oldCurrentProductIndex = 0; //Прошлый выбранный элемент в dataBaseGrid
@@ -58,7 +60,7 @@ namespace Dahmira
                     new TestData { Manufacturer = "Beerepoot", ProductName = "Привод 0,75кВт,консоль 2м, со вспомог. двигателем для поворотного колеса, для системы 290м, шт.", Unit = "шт.", Article = "60-84166-200", Cost = 5209.20 },
                     new TestData { Manufacturer = "Codaf", ProductName = "Лебедка электрическая с 2 катушками, крепежной пластиной и микропереключателем", Unit = "шт.", Article = "9102", Cost = 12.25 },
                     new TestData { Manufacturer = "Daltec", ProductName = "Привод STD 38/29, макс 0,75кВт", Article = "038101", Unit = "шт.", Cost = 652.24 },
-                    new TestData { Manufacturer = "Ermaf", ProductName = "Комплект замены стойки GP14", Article = "N70300135", Unit = "шт.", Cost = 35.74 },
+                    new TestData { Manufacturer = "Ermaf", ProductName = "Комплект замены стойки GP14", Article = "N70300135", Unit = "шт.", Cost = 35.54 },
                     new TestData { Manufacturer = "Fancom", ProductName = "Птицеводческий компьютер для напольного содержания, 8 зон, шт.", Unit = "шт.", Article = "F38", Cost = 3835.95 },
                     new TestData { Manufacturer = "Gasolec", ProductName = "Источник постоянного тока 48В,  (DC), макс. 320Вт, шт. ", Article = "PLP32048", Unit = "шт.", Cost = 86.90 },
                     new TestData { Manufacturer = "HS", ProductName = "Pad colling price for KIT L=1000, H is different, NOTE!!! typical length = 3 m", Article = "Cl.FR1m", Unit = "метр", Cost = 20.00 },
@@ -81,6 +83,7 @@ namespace Dahmira
                     CountryManager.Instance.allManufacturers.Add(new Manufacturer { name = item });
                 }
 
+                //Добавление ItemSource компонентам
                 Manufacturer_comboBox.ItemsSource = CountryManager.Instance.allManufacturers;
 
                 ProductName_comboBox.ItemsSource = items;
@@ -91,7 +94,6 @@ namespace Dahmira
                 allCountries_comboBox.ItemsSource = CountryManager.Instance.countries;
 
                 CalcDataGrid.ItemsSource = calcItems;
-
             }
             catch (Exception e) { MessageBox.Show(e.Message); }
         }
@@ -265,53 +267,60 @@ namespace Dahmira
 
         private void addToPrice_button_Click(object sender, RoutedEventArgs e) //Добавление в прайс новой строки
         {
-            //проверка на незаполненные поля
-            if (string.IsNullOrWhiteSpace(newManufacturer_textBox.Text) ||
-                string.IsNullOrWhiteSpace(newProductName_textBox.Text) ||
-                string.IsNullOrWhiteSpace(newArticle_textBox.Text) ||
-                string.IsNullOrWhiteSpace(newUnit_textBox.Text) ||
-                string.IsNullOrWhiteSpace(newCost_textBox.Text))
+            try
             {
-                MessageBox.Show("Не все поля заполнены.", "Ошибка ввода");
-                return;
+                //проверка на незаполненные поля
+                if (string.IsNullOrWhiteSpace(newManufacturer_textBox.Text) ||
+                    string.IsNullOrWhiteSpace(newProductName_textBox.Text) ||
+                    string.IsNullOrWhiteSpace(newArticle_textBox.Text) ||
+                    string.IsNullOrWhiteSpace(newUnit_textBox.Text) ||
+                    string.IsNullOrWhiteSpace(newCost_textBox.Text))
+                {
+                    MessageBox.Show("Не все поля заполнены.", "Ошибка ввода");
+                    return;
+                }
+
+                //Составление нового элемента прайса
+                TestData newPrice = new TestData
+                {
+                    Manufacturer = newManufacturer_textBox.Text,
+                    ProductName = newProductName_textBox.Text,
+                    Article = newArticle_textBox.Text,
+                    Unit = newUnit_textBox.Text,
+                    Cost = Convert.ToDouble(newCost_textBox.Text),
+                };
+
+                if (addedProductImage.Source.ToString() != "pack://application:,,,/resources/images/without_picture.png") //Если картинка изменилась
+                {
+                    //Конвертация из Image в массив байтов
+                    ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services();
+
+                    newPrice.Photo = converter.ConvertFromComponentImageToByteArray(addedProductImage);
+                }
+
+                //Добавление
+                items.Add(newPrice);
+                productsCount_label.Content = "из " + dataBaseGrid.Items.Count.ToString();
+
+                //Проверка на нового производителя
+                bool isNewManufacturer = !CountryManager.Instance.allManufacturers
+                                         .Any(manufacturerItem => manufacturerItem.name == newPrice.Manufacturer);
+                if (isNewManufacturer)
+                {
+                    CountryManager.Instance.allManufacturers.Add(new Manufacturer { name = newPrice.Manufacturer });
+                }
+                //Очистка строк и картинки от прошлого добавленного элемента
+                newManufacturer_textBox.Clear();
+                newProductName_textBox.Clear();
+                newArticle_textBox.Clear();
+                newUnit_textBox.Clear();
+                newCost_textBox.Clear();
+                addedProductImage.Source = new BitmapImage(new Uri("pack://application:,,,/resources/images/without_picture.png"));
             }
-
-            //Составление нового элемента прайса
-            TestData newPrice = new TestData
+            catch 
             {
-                Manufacturer = newManufacturer_textBox.Text,
-                ProductName = newProductName_textBox.Text,
-                Article = newArticle_textBox.Text,
-                Unit = newUnit_textBox.Text,
-                Cost = Convert.ToDouble(newCost_textBox.Text),
-            };
-
-            if (addedProductImage.Source.ToString() != "pack://application:,,,/resources/images/without_picture.png") //Если картинка изменилась
-            {
-                //Конвертация из Image в массив байтов
-                ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services();
-
-                newPrice.Photo = converter.ConvertFromComponentImageToByteArray(addedProductImage);
+                MessageBox.Show("Формат введённых данных неверен");
             }
-
-            //Добавление
-            items.Add(newPrice);
-            productsCount_label.Content = "из " + dataBaseGrid.Items.Count.ToString();
-
-            //Проверка на нового производителя
-            bool isNewManufacturer = !CountryManager.Instance.allManufacturers
-                                     .Any(manufacturerItem => manufacturerItem.name == newPrice.Manufacturer);
-            if (isNewManufacturer)
-            {
-                CountryManager.Instance.allManufacturers.Add(new Manufacturer { name = newPrice.Manufacturer });
-            }
-            //Очистка строк и картинки от прошлого добавленного элемента
-            newManufacturer_textBox.Clear();
-            newProductName_textBox.Clear();
-            newArticle_textBox.Clear();
-            newUnit_textBox.Clear();
-            newCost_textBox.Clear();
-            addedProductImage.Source = new BitmapImage(new Uri("pack://application:,,,/resources/images/without_picture.png"));
         }
 
         private void deleteSelectedProduct_button_Click(object sender, RoutedEventArgs e) //Удаление выделенного элемента прайса
@@ -389,48 +398,42 @@ namespace Dahmira
 
         private void dataBaseGrid_MouseDoubleClick(object sender, EventArgs e) //Добавление в расчётку при двойном нажатии на элемент 
         {
-            TestData selectedItem = (TestData)dataBaseGrid.SelectedItem;
-
-            CalcProduct newCalcProductItem = new CalcProduct
+            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, fullCost_label, calcItems);
+            if(!isAddedWell) 
             {
-                Num = calcItems.Count + 1,
-                Manufacturer = selectedItem.Manufacturer,
-                ProductName = selectedItem.ProductName,
-                Article = selectedItem.Article,
-                Unit = selectedItem.Unit,
-                Photo = selectedItem.Photo,
-                RealCost = selectedItem.Cost,
-                Cost = selectedItem.Cost,
-                Count = 1,
-                TotalCost = selectedItem.Cost,
-                ID = 0,
-                ID_Art = 0,
-                Note = ""
-            };
-
-            calcItems.Add(newCalcProductItem);
+                MessageBox.Show("Для начала добавьте раздел!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
+                CalcController.ObjectFlashing(priceCalcButton, Colors.LightGray, Colors.White);
+            }
         }
 
         private void CalcdataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e) //При смене текущего выделенного элемента расчётки
         {
-
-            //Отображении информации о текущем выделенном элементе
-            CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem; //Получение текущего выделенного элемента
-            if (selectedItem != null)
+            try
             {
+                //Отображении информации о текущем выделенном элементе
+                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem; //Получение текущего выделенного элемента
+                if (selectedItem != null)
+                {
+                    if(selectedItem.ProductName == null)
+                    {
+                        CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
+                        return;
+                    }
 
-                var fileImageBytes = converter.ConvertFromFileImageToByteArray("without_image_database.png");
-                if (BitConverter.ToString(fileImageBytes) == BitConverter.ToString(selectedItem.Photo)) //Если нет фотографии
-                {
-                    CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
-                }
-                else
-                {
-                    // Вызов метода Convert для преобразования массива байтов в BitmapImage
-                    var converter = new ByteArrayToImageSourceConverter_Services();
-                    CalcProductImage.Source = (BitmapImage)converter.Convert(selectedItem.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
+                    var fileImageBytes = converter.ConvertFromFileImageToByteArray("without_image_database.png");
+                    if (BitConverter.ToString(fileImageBytes) == BitConverter.ToString(selectedItem.Photo)) //Если нет фотографии
+                    {
+                        CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
+                    }
+                    else
+                    {
+                        // Вызов метода Convert для преобразования массива байтов в BitmapImage
+                        var converter = new ByteArrayToImageSourceConverter_Services();
+                        CalcProductImage.Source = (BitmapImage)converter.Convert(selectedItem.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
+                    }
                 }
             }
+            catch { }
         }
 
         private void CalcDeleteSelectedProduct_button_Click(object sender, RoutedEventArgs e) //Удаление выбранного товара из расчётки
@@ -439,6 +442,8 @@ namespace Dahmira
             {
                 CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
                 calcItems.Remove(selectedItem);
+
+                CalcController.Refresh(CalcDataGrid, calcItems, fullCost_label);
             }
             catch { }
         }
@@ -450,58 +455,60 @@ namespace Dahmira
             if (selectedItem != null)
             {
                 selectedItem.TotalCost = selectedItem.Cost * selectedItem.Count;
-                CalcDataGrid.Dispatcher.BeginInvoke(new Action(() => { CalcDataGrid.Items.Refresh(); }));
+                CalcDataGrid.Dispatcher.BeginInvoke(new Action(() => { CalcController.Refresh(CalcDataGrid, calcItems, fullCost_label); }));
             }
         }
 
-        private void allCountries_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void allCountries_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) //Изменение ценников в зависимости от местных поставщиков выбранной страны
         {
             var selectedCountry = (Country)allCountries_comboBox.SelectedItem;
 
             foreach(var item in calcItems)
             {
-                item.Cost = item.RealCost * selectedCountry.coefficient;
-                
-                foreach(var countryManufacturer in selectedCountry.manufacturers)
+                if(item.ProductName != null)
                 {
-                    if(countryManufacturer.name == item.Manufacturer)
+                    item.Cost = Math.Round(item.RealCost * selectedCountry.coefficient, 2);
+
+                    foreach (var countryManufacturer in selectedCountry.manufacturers)
                     {
-                        double discount = item.Cost * selectedCountry.discount;
-                        item.Cost -= discount;
+                        if (countryManufacturer.name == item.Manufacturer)
+                        {
+                            double discount = item.Cost * selectedCountry.discount;
+                            item.Cost -= discount;
+                        }
                     }
                 }
             }
 
-            CalcRefresh_button_Click(CalcRefresh_button, e);
+            CalcController.Refresh(CalcDataGrid, calcItems, fullCost_label);
         }
 
-        private void CalcRefresh_button_Click(object sender, RoutedEventArgs e)
+        private void CalcRefresh_button_Click(object sender, RoutedEventArgs e) //Обновление расчётки
         {
-            for(int i = 0; i < calcItems.Count; i++)
-            {
-                CalcProduct item = calcItems[i];
-                item.TotalCost = item.Cost * item.Count;
-                if(item.Num != i + 1)
-                {
-                    item.Num = i + 1;
-                }
-            }
-
-            CalcDataGrid.Items.Refresh();
+            CalcController.Refresh(CalcDataGrid, calcItems, fullCost_label); //Обновление
         }
 
         private void CalcUploadFromFile_Click(object sender, RoutedEventArgs e) //Загрузка картинки из файла в элемент расчётки
         {
             try
             {
-                bool imageIsEdit = ImageUpdater.UploadImageFromFile(CalcProductImage); //Загрузка картинки
-
-                if (imageIsEdit) //Если картинку загрузили
+                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+                if(selectedItem != null)
                 {
-                    //Изменение картинки в dataBaseGrid
-                    int index = CalcDataGrid.SelectedIndex;
-                    calcItems[index].Photo = converter.ConvertFromComponentImageToByteArray(CalcProductImage);
-                    CalcDataGrid.Items.Refresh();
+                    bool imageIsEdit = ImageUpdater.UploadImageFromFile(CalcProductImage); //Загрузка картинки
+                    //Если сейчас выбран раздел
+                    if (selectedItem.ProductName == null)
+                    {
+                        return;
+                    }
+
+                    if (imageIsEdit) //Если картинку загрузили
+                    {
+                        //Изменение картинки в dataBaseGrid
+                        int index = CalcDataGrid.SelectedIndex;
+                        calcItems[index].Photo = converter.ConvertFromComponentImageToByteArray(CalcProductImage);
+                        CalcDataGrid.Items.Refresh();
+                    }
                 }
             }
             catch { }
@@ -510,11 +517,22 @@ namespace Dahmira
         private void CalcDeleteImage_Click(object sender, RoutedEventArgs e) //Удаление картинки элемента расчётки
         {
             try
-            {
-                ImageUpdater.DeleteImage(CalcProductImage);
-                int index = CalcDataGrid.SelectedIndex;
-                calcItems[index].Photo = converter.ConvertFromFileImageToByteArray("without_image_database.png");
-                CalcDataGrid.Items.Refresh();
+            {   
+                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+                if (selectedItem != null) 
+                {
+                    ImageUpdater.DeleteImage(CalcProductImage);
+
+                    //Если сейчас выбран раздел
+                    if (selectedItem.ProductName == null)
+                    {
+                        return;
+                    }
+
+                    int index = CalcDataGrid.SelectedIndex;
+                    calcItems[index].Photo = converter.ConvertFromFileImageToByteArray("without_image_database.png");
+                    CalcDataGrid.Items.Refresh();
+                }
             }
             catch { }
         }
@@ -528,14 +546,24 @@ namespace Dahmira
         {
             try
             {
-                bool imageIsEdit = ImageUpdater.UploadImageFromClipboard(CalcProductImage); //Загрузка картинки
-
-                if (imageIsEdit) //Если картинку загрузили
+                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+                if(selectedItem != null) 
                 {
-                    //Изменение картинки в dataBaseGrid
-                    int index = CalcDataGrid.SelectedIndex;
-                    calcItems[index].Photo = converter.ConvertFromComponentImageToByteArray(CalcProductImage);
-                    CalcDataGrid.Items.Refresh();
+                    bool imageIsEdit = ImageUpdater.UploadImageFromClipboard(CalcProductImage); //Загрузка картинки
+
+                    //Если сейчас выбран раздел
+                    if (selectedItem.ProductName == null)
+                    {
+                        return;
+                    }
+
+                    if (imageIsEdit) //Если картинку загрузили
+                    {
+                        //Изменение картинки в dataBaseGrid
+                        int index = CalcDataGrid.SelectedIndex;
+                        calcItems[index].Photo = converter.ConvertFromComponentImageToByteArray(CalcProductImage);
+                        CalcDataGrid.Items.Refresh();
+                    }
                 }
             }
             catch { }
@@ -548,7 +576,68 @@ namespace Dahmira
 
         private void AddToCalc_button_Click(object sender, RoutedEventArgs e) //Добавление выделенного элемента DAtaBaseGrid в расчётку
         {
-            dataBaseGrid_MouseDoubleClick(CalcDataGrid, e);
+            if (string.IsNullOrWhiteSpace(CountProductToAdd_textBox.Text)) //Если количество не указано
+            {
+                MessageBox.Show("Количество не указано!", "Ошибка");
+                return;
+            }
+            int count = Convert.ToInt32(CountProductToAdd_textBox.Text); //Получение количества
+            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, fullCost_label, calcItems, count); //Добавление
+            if(!isAddedWell) 
+            {
+                MessageBox.Show("Для начала добавьте Раздел!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
+                CalcController.ObjectFlashing(priceCalcButton, Colors.LightGray, Colors.White);
+            }
+        }
+
+        private void AddToCalcUnderSelectedRow_button_Click(object sender, RoutedEventArgs e)
+        {
+            if(string.IsNullOrWhiteSpace(CountProductToAdd_textBox.Text)) //Если количество не указано
+            {
+                MessageBox.Show("Количество не указано!", "Ошибка");
+                return;
+            }
+            int count = Convert.ToInt32(CountProductToAdd_textBox.Text); //Получение количества
+            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, fullCost_label, calcItems, count, "UnderSelect"); //Добавление
+            if (!isAddedWell)
+            {
+                MessageBox.Show("Для начала добавьте Раздел!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
+                CalcController.ObjectFlashing(priceCalcButton, Colors.LightGray, Colors.White);
+            }
+        }
+
+        private void ReplaceCalc_button_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(CountProductToAdd_textBox.Text)) //Если количество не указано
+            {
+                MessageBox.Show("Количество не указано!", "Ошибка");
+                return;
+            }
+            int count = Convert.ToInt32(CountProductToAdd_textBox.Text); //Получение количества
+            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, fullCost_label, calcItems, count, "Replace"); //Замена
+            if (!isAddedWell)
+            {
+                MessageBox.Show("Для начала добавьте Раздел!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
+                CalcController.ObjectFlashing(priceCalcButton, Colors.LightGray, Colors.White);
+            }
+        }
+
+        private void CalcChapter_button_Click(object sender, RoutedEventArgs e) //Создание раздела
+        {
+            int selectedIndex = CalcDataGrid.SelectedIndex; //Индекс текущего выделенного элемента
+            string chapterName = chapterName_textBox.Text;
+
+            //Создание раздела
+            CalcProduct chapter = new CalcProduct
+            {
+                Manufacturer = chapterName,
+                Cost = double.NaN,
+                TotalCost = double.NaN
+            };
+
+            //Добавление
+            calcItems.Insert(selectedIndex + 1, chapter);
+            chapterName_textBox.Width = 0;
         }
     }
 

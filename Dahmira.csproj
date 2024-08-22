@@ -9,9 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="chapter.png" />
     <None Remove="refresh.png" />
     <None Remove="resources\images\add.png" />
     <None Remove="resources\images\arrow_left.png" />
+    <None Remove="resources\images\chapter.png" />
     <None Remove="resources\images\delete_image.png" />
     <None Remove="resources\images\delete_manufacturer.png" />
     <None Remove="resources\images\download_to_clipboard.png" />
@@ -29,9 +31,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="chapter.png" />
     <Resource Include="refresh.png" />
     <Resource Include="resources\images\add.png" />
     <Resource Include="resources\images\arrow_left.png" />
+    <Resource Include="resources\images\chapter.png" />
     <Resource Include="resources\images\delete_image.png" />
     <Resource Include="resources\images\delete_manufacturer.png" />
     <Resource Include="resources\images\download_to_clipboard.png" />

@@ -102,7 +102,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="46"/>
             <RowDefinition Height="218.009"/>
-            <RowDefinition/>
+            <RowDefinition Height="47*"/>
+            <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
 
         <!--Контур с меню-->
@@ -410,7 +411,8 @@
                         Height="24" Width="150" 
                         Foreground="Gray" FontSize="14" Grid.Row="4" HorizontalContentAlignment="Right" Grid.Column="3"/>
 
-                    <TextBox Grid.Row="4" Grid.Column="4" Margin="0,1,13,1" FontSize="14" Foreground="Gray" FontFamily="Arial Black" Grid.ColumnSpan="3"/>
+                    <TextBox x:Name="CountProductToAdd_textBox" Text="1"
+                             Grid.Row="4" Grid.Column="4" Margin="0,1,13,1" FontSize="14" Foreground="Gray" FontFamily="Arial Black" Grid.ColumnSpan="3"/>
 
                     <Button x:Name="uploadFromFile_button"
                             Template="{StaticResource btTemplate}" 
@@ -542,21 +544,25 @@
                             Background="MediumSeaGreen" Foreground="White" FontSize="14" Grid.ColumnSpan="2" Grid.Row="5" Grid.Column="1" Margin="0,0,81,0"
                             Click="AddToCalc_button_Click"/>
 
-                    <Button Content="ДОБАВИТЬ В РАСЧЁТКУ ПОД СТРОКОЙ      " 
+                    <Button x:Name="AddToCalcUnderSelectedRow_button"
+                            Content="ДОБАВИТЬ В РАСЧЁТКУ ПОД СТРОКОЙ      " 
                             Grid.Row="5"
                             Grid.Column="2"
                             VerticalAlignment="Center" 
                             Width="Auto"
                             Template="{StaticResource btTemplate}" Margin="60,0,2,0" Height="40" FontFamily="Arial Black"
-                            Background="Coral" Foreground="White" FontSize="14" Grid.ColumnSpan="3"/>
+                            Background="Coral" Foreground="White" FontSize="14" Grid.ColumnSpan="3"
+                            Click="AddToCalcUnderSelectedRow_button_Click"/>
 
-                    <Button Content="ЗАМЕНИТЬ      " 
+                    <Button x:Name="ReplaceCalc_button"
+                            Content="ЗАМЕНИТЬ      " 
                             Grid.Row="5"
                             Grid.Column="5"
                             VerticalAlignment="Center" 
                             Width="Auto"
                             Template="{StaticResource btTemplate}" Margin="3,0,13,0" Height="40" FontFamily="Arial Black"
-                            Background="OrangeRed" Foreground="White" FontSize="14" Grid.ColumnSpan="2"/>
+                            Background="OrangeRed" Foreground="White" FontSize="14" Grid.ColumnSpan="2"
+                            Click="ReplaceCalc_button_Click"/>
 
                 </Grid>
 
@@ -568,19 +574,19 @@
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="181"/>
-                        <ColumnDefinition Width="134"/>
+                        <ColumnDefinition Width="151"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
 
                     <Image x:Name="CalcProductImage" Margin="15,17,15,10" Source="/resources/images/without_picture.png" Grid.RowSpan="2"/>
 
-                    <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Bottom" Height="40" Margin="0,0,0,2" Grid.Row="0">
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top" Height="40" Margin="0,22,0,0" Grid.Row="0">
                         <Button x:Name="CalcUploadFromFile"
                                 Template="{StaticResource btTemplate}"
                                 Height="40" Width="40"
                                 Background="Coral" 
                                 ToolTip="Вставить из файла"
-                                Margin="2,0"
+                                Margin="5,0"
                                 Click="CalcUploadFromFile_Click">
 
                             <Image Source="/resources/images/upload_from_file.png" Height="27" Width="27" Margin="-30,0,0,0"/>
@@ -590,7 +596,7 @@
                                 Height="40" Width="40"
                                 Background="OrangeRed" 
                                 ToolTip="Удалить фото" 
-                                Margin="2,0"
+                                Margin="5,0"
                                 Click="CalcDeleteImage_Click">
 
                             <Image Source="/resources/images/delete_image.png" Height="27" Width="27" Margin="-30,0,0,0"/>
@@ -600,20 +606,20 @@
                                 Height="40" Width="40"
                                 Background="Coral" 
                                 ToolTip="Сохранить в файл" 
-                                Margin="2,0"
+                                Margin="5,0"
                                 Click="CalcDownloadToFile_Click">
 
                             <Image Source="/resources/images/download_to_file.png" Height="27" Width="27" Margin="-30,0,0,0"/>
                         </Button>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" Height="40" Margin="23,2,23,0">
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" Height="40" Margin="23,7,23,0">
                         <Button x:Name="CalcUploadFromClipboard"
                                 Template="{StaticResource btTemplate}"
                                 Height="40" Width="40"
                                 Background="#FF50CBFF" 
                                 ToolTip="Вставить из буфера"
-                                Margin="2,0"
+                                Margin="5,0"
                                 Click="CalcUploadFromClipboard_Click">
 
                             <Image Source="/resources/images/upload_from_clipboard.png" Height="27" Width="27" Margin="-30,0,0,0"/>
@@ -623,19 +629,19 @@
                                 Height="40" Width="40"
                                 Background="#FF50CBFF" 
                                 ToolTip="Сохранить в буфер" 
-                                Margin="2,0"
+                                Margin="5,0"
                                 Click="CalcDownloadToClipboard_Click">
 
                             <Image Source="/resources/images/download_to_clipboard.png" Height="27" Width="27" Margin="-30,0,0,0"/>
                         </Button>
                     </StackPanel>
 
-                    <Label Content="НАСТРОЙКА ЦЕНЫ:" FontFamily="Arial Black" Foreground="Gray" Margin="176,48,1581,19" Grid.Row="1" Grid.ColumnSpan="3"/>
-                    
+                    <Label Content="НАСТРОЙКА ЦЕНЫ:" FontFamily="Arial Black" Foreground="Gray" Margin="3,48,2,19" Grid.Row="1" Grid.Column="1"/>
+
                     <ComboBox x:Name="allCountries_comboBox" 
-                              DisplayMemberPath="name" Foreground="Gray" FontFamily="Arial Black" Grid.ColumnSpan="3" Margin="172,70,1581,10" Grid.Row="1"
+                              DisplayMemberPath="name" Foreground="Gray" FontFamily="Arial Black" Margin="0,70,0,10" Grid.Row="1"
                               SelectionChanged="allCountries_comboBox_SelectionChanged"
-                              SelectedIndex="0"/>
+                              SelectedIndex="0" Grid.Column="1"/>
 
                 </Grid>
             </Grid>
@@ -646,7 +652,7 @@
             Grid.Row="2"
             Background ="White" 
             CornerRadius="15,15,15,15" 
-            Margin="5,5,5,5" RenderTransformOrigin="0.501,0.554">
+            Margin="5,5,5,5" RenderTransformOrigin="0.501,0.554" Grid.RowSpan="2">
 
             <Grid>
                 <!--Сетка с элементами управлени я основной БД-->
@@ -714,7 +720,7 @@
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="40"
                                 Background="MediumSeaGreen" 
-                                VerticalAlignment="Top" 
+                                VerticalAlignment="Top"
                                 Margin="0,0,5,0"
                                 ToolTip="Сохранить в прайс текущие изменения">
 
@@ -722,10 +728,10 @@
                         </Button>
                     </StackPanel>
                     <DataGrid x:Name="dataBaseGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="White"
-                              SelectionChanged="dataBaseGrid_SelectionChanged" RowHeight="40" MinRowHeight="40"
+                              SelectionChanged="dataBaseGrid_SelectionChanged" RowHeight="30" MinRowHeight="30"
                               MouseDoubleClick="dataBaseGrid_MouseDoubleClick"
                               CanUserAddRows="False" FontFamily="Arial Black" Foreground="Gray"
-                              RowHeaderWidth="0">
+                              RowHeaderWidth="0" SelectedIndex="0">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Производитель" Binding="{Binding Manufacturer}" Width="20*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Наименование"  Binding="{Binding ProductName}" Width="50*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
@@ -734,7 +740,7 @@
                             <DataGridTemplateColumn Header="Изображение" Width="10*" MinWidth="50" IsReadOnly="True">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding Photo, Converter={StaticResource ByteArrayToImageSourceConverter}}" Width="Auto" Height="Auto" MaxWidth="100" MaxHeight="100" MinHeight="30" MinWidth="30"/>
+                                        <Image Source="{Binding Photo, Converter={StaticResource ByteArrayToImageSourceConverter}}" Width="Auto" Height="Auto" MaxWidth="100" MaxHeight="100" MinHeight="20" MinWidth="20"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -747,7 +753,8 @@
                 <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Visible">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="61"/>
-                        <RowDefinition/>
+                        <RowDefinition Height="137*"/>
+                        <RowDefinition Height="7*"/>
                     </Grid.RowDefinitions>
 
                     <StackPanel Margin="10,10,10,10" Grid.Row="0" Orientation="Horizontal">
@@ -775,14 +782,30 @@
                             <Image Source="/refresh.png" Height="32" Width="32" Margin="-30,0,0,0"/>
                         </Button>
 
+                        <Button x:Name="CalcChapter_button"
+                                Template="{StaticResource btTemplate}" 
+                                Height="40" Width="40"
+                                Background="#FF50CBFF" 
+                                VerticalAlignment="Top" 
+                                Margin="0,0,5,0" 
+                                ToolTip="Создать раздел"
+                                Click="CalcChapter_button_Click">
+
+                            <Image Source="/chapter.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                        </Button>
+
+                        <Label Content="ИМЯ РАЗДЕЛА:" VerticalAlignment="Center" FontFamily="Arial Black" Foreground="Gray"/>
+                        <TextBox x:Name="chapterName_textBox" Text="Раздел"
+                                 Width="100" VerticalAlignment="Center" FontFamily="Arial Black" Foreground="Gray" BorderThickness="1"/>
+
                     </StackPanel>
-                    <DataGrid x:Name="CalcDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="White" Foreground="Gray" FontFamily="Arial Black"
-                              RowHeight="40" MinRowHeight="40"
+                    <DataGrid x:Name="CalcDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,10" Background="White" Foreground="Gray" FontFamily="Arial Black"
+                              RowHeight="30" MinRowHeight="30"
                               CanUserAddRows="False" HorizontalScrollBarVisibility="Disabled" RowHeaderWidth="0"
                               SelectedCellsChanged="CalcdataGrid_SelectedCellsChanged"
                               CurrentCellChanged="CalcDataGrid_CurrentCellChanged">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="№" Binding="{Binding Num}" Width="1*" MinWidth="30" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="№" Binding="{Binding Num, Converter={StaticResource NullToEmptyStringConverter}}" Width="1*" MinWidth="30" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Производитель" Binding="{Binding Manufacturer}" Width="10*" MinWidth="120" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Наименование"  Binding="{Binding ProductName}" Width="40*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Артикул"  Binding="{Binding Article}" Width="6*" MinWidth="70" IsReadOnly="True"></DataGridTextColumn>
@@ -790,18 +813,23 @@
                             <DataGridTemplateColumn Header="Изображение" Width="10*" MinWidth="50" IsReadOnly="True">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding Photo, Converter={StaticResource ByteArrayToImageSourceConverter}}" Width="Auto" Height="Auto" MaxWidth="100" MaxHeight="100" MinHeight="30" MinWidth="30"/>
+                                        <Image Source="{Binding Photo, Converter={StaticResource ByteArrayToImageSourceConverter}}" Width="Auto" Height="Auto" MaxWidth="100" MaxHeight="100" MinHeight="20" MinWidth="20"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Цена"  Binding="{Binding Cost}" Width="5*" MinWidth="75" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Количество"  Binding="{Binding Count}" Width="5*" MinWidth="50" IsReadOnly="False"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Итоговая цена"  Binding="{Binding TotalCost}" Width="7*" MinWidth="75" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="ID"  Binding="{Binding ID}" Width="2*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="ID Art."  Binding="{Binding ID_Art}" Width="5*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Цена"  Binding="{Binding Cost, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="75" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Количество"  Binding="{Binding Count, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="50" IsReadOnly="False"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Итоговая цена"  Binding="{Binding TotalCost, Converter={StaticResource NullToEmptyStringConverter}}" Width="7*" MinWidth="75" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="ID"  Binding="{Binding ID, Converter={StaticResource NullToEmptyStringConverter}}" Width="2*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="ID Art."  Binding="{Binding ID_Art, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Примечание"  Binding="{Binding Note}" Width="6*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
+
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Label x:Name="fullCostType_label"  Content="ИТОГО БЕЗ НДС:" FontFamily="Arial Black" Foreground="Gray" FontSize="17" Height="27"/>
+                        <Label x:Name="fullCost_label" Content="0" FontFamily="Arial Black" Foreground="Gray" FontSize="17" Height="27" Margin="0,0,10,0"/>
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Border>
