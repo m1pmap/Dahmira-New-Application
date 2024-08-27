@@ -655,8 +655,8 @@
             Margin="5,5,5,5" RenderTransformOrigin="0.501,0.554">
 
             <Grid>
-                <!--Сетка с элементами управлени я основной БД-->
-                <Grid x:Name="DataBaseGrid_Grid" Margin="0,0,0,10" Visibility="Hidden">
+                <!--Сетка с элементами управления основной БД-->
+                <Grid x:Name="DataBaseGrid_Grid" Margin="0,0,0,10" Visibility="Visible">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="61"/>
                         <RowDefinition/>
@@ -749,7 +749,7 @@
                 </Grid>
 
                 <!--Сетка с элементами управления и dataGrid расчётки-->
-                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Visible">
+                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Hidden">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="953*"/>
                         <ColumnDefinition Width="957*"/>
@@ -826,7 +826,8 @@
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="60"
                                 Background="MediumSeaGreen" 
-                                ToolTip="Экспортировать в Excel новым листом">
+                                ToolTip="Экспортировать в Excel новым листом"
+                                Click="CalcToNewSheetExcel_button_Click">
 
                             <Image Source="pack://application:,,,/resources/images/calcToNewSheetExcel.png" Height="30" Width="50" VerticalAlignment="Top" Margin="-30,0,0,0"/>
                         </Button>

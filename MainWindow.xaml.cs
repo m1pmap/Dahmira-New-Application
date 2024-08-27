@@ -35,12 +35,11 @@ namespace Dahmira
         private ICalcController CalcController = new CalcController_Services();//Для работы с обновлением/добавлением в расчётку
         private ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services(); //???Для Конвертации изображения в массив байтов и обратно???
         public SettingsParameters settings = new SettingsParameters();
-        private int ExcelFileCount = 1;
 
         int oldCurrentProductIndex = 0; //Прошлый выбранный элемент в dataBaseGrid
 
         private ObservableCollection<TestData> items; //Элементы в БД
-        private ObservableCollection<CalcProduct> calcItems = new ObservableCollection<CalcProduct>(); //Элементы в БД
+        public ObservableCollection<CalcProduct> calcItems = new ObservableCollection<CalcProduct>(); //Элементы в БД
 
         public MainWindow()
         {
@@ -638,151 +637,21 @@ namespace Dahmira
         {
             try
             {
-                ExcelPackage.LicenseContext = LicenseContext.Commercial;
-                var package = new ExcelPackage();
-                var worksheet = package.Workbook.Worksheets.Add("Лист1");
-                int lastColumnIndex = 10;
+                IFileImporter importer = new FileImporter_Services();
+                importer.ImportToExcel(this);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
 
-                if (settings.IsInsertExcelPicture == false) //Если фото не добавляется, то количество столбцов меньше
-                {
-                    lastColumnIndex = 9;
-                }
-
-                // Записываем заголовки столбцов
-                for (int i = 0; i < lastColumnIndex; i++)
-                {
-                    if (i >= 5 && settings.IsInsertExcelPicture == false) //Если картинка не добавляется
-                    {
-                        worksheet.Cells[1, i + 1].Value = CalcDataGrid.Columns[i + 1].Header;
-                    }
-                    else
-                    {
-                        worksheet.Cells[1, i + 1].Value = CalcDataGrid.Columns[i].Header;
-                    }
-                    
-                }
-                worksheet.Cells[1, lastColumnIndex].Value = "Примечания";
-
-                //Установка стилей для Header 
-                ExcelRange titleRange = worksheet.Cells[1, 1, 1, lastColumnIndex];
-                titleRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                titleRange.Style.Fill.BackgroundColor.SetColor(settings.ExcelTitleColor.Color);
-
-                //Установка стилей для всего рабочего пространства
-                ExcelRange Rng = worksheet.Cells[1, 1, calcItems.Count + 2, lastColumnIndex];
-                Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                Rng.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                Rng.Style.WrapText = true;
-
-                Rng.Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                Rng.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                Rng.Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                Rng.Style.Border.Right.Style = ExcelBorderStyle.Thin;
-
-                Rng.Style.Border.Top.Color.SetColor(System.Drawing.Color.Gray);
-                Rng.Style.Border.Bottom.Color.SetColor(System.Drawing.Color.Gray);
-                Rng.Style.Border.Left.Color.SetColor(System.Drawing.Color.Gray);
-                Rng.Style.Border.Right.Color.SetColor(System.Drawing.Color.Gray);
-
-                //Установка ширины столбцов 
-                worksheet.Column(1).Width = 4.29;
-                worksheet.Column(2).Width = 27.14;
-                worksheet.Column(3).Width = 50.86;
-                worksheet.Column(4).Width = 22.14;
-                worksheet.Column(5).Width = 15.43;
-                worksheet.Column(lastColumnIndex - 3).Width = 10.14;
-                worksheet.Column(lastColumnIndex - 2).Width = 12.14;
-                worksheet.Column(lastColumnIndex - 1).Width = 24.14;
-                worksheet.Column(lastColumnIndex).Width = 18.43;
-
-                // Записываем данные из DataGrid
-                for (int i = 0; i < calcItems.Count; i++)
-                {
-                    CalcProduct item = calcItems[i];
-
-                    if (item.Photo == null) //Если фото равно нулю (Раздел)
-                    {
-                        worksheet.Cells[i + 2, 2].Value = item.Manufacturer; //Имя раздела
-                        //Стили для раздела
-                        ExcelRange chapterRange = worksheet.Cells[i + 2, 1, i + 2, lastColumnIndex];
-                        chapterRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        chapterRange.Style.Fill.BackgroundColor.SetColor(settings.ExcelChapterColor.Color);
-                        continue;
-                    }
-
-                    //Установка стилей всех данных
-                    ExcelRange dataRange = worksheet.Cells[i + 2, 1, i + 2, lastColumnIndex];
-                    dataRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    dataRange.Style.Fill.BackgroundColor.SetColor(settings.ExcelDataColor.Color);
-
-                    //Установка стилей для примечаний
-                    ExcelRange notesRange = worksheet.Cells[i + 2, lastColumnIndex];
-                    notesRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    notesRange.Style.Fill.BackgroundColor.SetColor(settings.ExcelNotesColor.Color);
-
-                    //Установка стилей для номера
-                    ExcelRange numberRange = worksheet.Cells[i + 2, 1];
-                    numberRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    numberRange.Style.Fill.BackgroundColor.SetColor(settings.ExcelNumberColor.Color);
-
-                    //Добавление данных в ячейки
-                    worksheet.Cells[i + 2, 1].Value = item.Num;
-                    worksheet.Cells[i + 2, 2].Value = item.Manufacturer;
-                    worksheet.Cells[i + 2, 3].Value = item.ProductName;
-                    worksheet.Cells[i + 2, 4].Value = item.Article;
-                    worksheet.Cells[i + 2, 5].Value = item.Unit;
-
-                    if(settings.IsInsertExcelPicture == true) //Если картинку надо добавить
-                    {
-                        //Установка стилей для фона фото 
-                        ExcelRange photoRange = worksheet.Cells[i + 2, 6];
-                        photoRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        photoRange.Style.Fill.BackgroundColor.SetColor(settings.ExcelPhotoBackgroundColor.Color);
-
-                        BitmapImage bitmapImage = (BitmapImage)converter.Convert(item.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
-
-                        //Ширина и высота в зависимости от выбранных параметров в настройках
-                        worksheet.Column(6).Width = (settings.MaxExcelPhotoWidth + 10) / 7;
-                        worksheet.Rows[i + 2].Height = (settings.MaxExcelPhotoHeight + 10) / 1.33;
-
-                        //MemoryStream для создания временного файла для дальнейшей конвертации в FileInfo
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            //Кодек для сохранения изображения
-                            var encoder = new PngBitmapEncoder();
-                            encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
-                            encoder.Save(memoryStream);
-
-                            //Сброс позиции потока в начало
-                            memoryStream.Position = 0;
-
-                            //Добавление изображения в Excel
-                            var excelImage = worksheet.Drawings.AddPicture(i.ToString(), memoryStream);
-                            excelImage.SetPosition(i + 1, 3, 5, 3);
-                            excelImage.SetSize(settings.MaxExcelPhotoWidth, settings.MaxExcelPhotoHeight);
-
-                            
-                        }
-                    }
-
-                    //Добавление остальных данных в ячейки
-                    worksheet.Cells[i + 2, lastColumnIndex - 3].Value = item.Cost;
-                    worksheet.Cells[i + 2, lastColumnIndex - 2].Value = item.Count;
-                    worksheet.Cells[i + 2, lastColumnIndex - 1].Value = item.TotalCost;
-                    worksheet.Cells[i + 2, lastColumnIndex].Value = item.Note;
-                }
-
-                worksheet.Cells[calcItems.Count + 2, lastColumnIndex - 1].Value = settings.TotalCostValue + " " + fullCost.Content;
-
-                //Сохранение в Excel файл по указанному в Настройках пути
-                DialogPage dialog = new DialogPage("excel");
-                dialog.ShowDialog();
-                if (dialog.Result != string.Empty)
-                {
-                    worksheet.Protection.IsProtected = false;
-                    worksheet.Protection.AllowSelectLockedCells = false;
-                    package.SaveAs(new FileInfo(settings.ExcelFolderPath + dialog.Result + ".xlsx"));
-                }
+        private void CalcToNewSheetExcel_button_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                IFileImporter importer = new FileImporter_Services();
+                importer.ImportToExcelAsNewSheet(this);
             }
             catch (Exception exception)
             {

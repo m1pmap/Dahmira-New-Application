@@ -20,19 +20,9 @@ namespace Dahmira.Pages
     public partial class DialogPage : Window
     {
         public string Result { get; private set; } = string.Empty;
-        public DialogPage(string type)
+        public DialogPage()
         {
             InitializeComponent();
-            if(type == "excel")
-            {
-                title.Content = "ИМЯ ФАЙЛА ДЛЯ ЭКСПОРТА В EXCEL:";
-                FileName.Text = "Excel";
-            }
-            if(type == "pdf")
-            {
-                title.Content = "ИМЯ ФАЙЛА ДЛЯ ЭКСПОРТА В PDF:";
-                FileName.Text = "PDF";
-            }
         }
 
         private void OK_button_Click(object sender, RoutedEventArgs e)
