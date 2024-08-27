@@ -9,16 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="chapter.png" />
-    <None Remove="refresh.png" />
     <None Remove="resources\images\add.png" />
     <None Remove="resources\images\arrow_left.png" />
+    <None Remove="resources\images\calcToExcel.png" />
+    <None Remove="resources\images\calcToNewSheetExcel.png" />
     <None Remove="resources\images\chapter.png" />
     <None Remove="resources\images\delete_image.png" />
     <None Remove="resources\images\delete_manufacturer.png" />
     <None Remove="resources\images\download_to_clipboard.png" />
     <None Remove="resources\images\download_to_file.png" />
     <None Remove="resources\images\fast_search.png" />
+    <None Remove="resources\images\refresh.png" />
     <None Remove="resources\images\save.png" />
     <None Remove="resources\images\search.png" />
     <None Remove="resources\images\sort.png" />
@@ -26,21 +27,24 @@
     <None Remove="resources\images\upload_from_file.png" />
     <None Remove="resources\images\without_image_database.png" />
     <None Remove="resources\images\without_picture.png" />
-    <None Remove="save.png" />
-    <None Remove="without_image_database.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="chapter.png" />
-    <Resource Include="refresh.png" />
+    <PackageReference Include="EPPlus" Version="7.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="resources\images\add.png" />
     <Resource Include="resources\images\arrow_left.png" />
+    <Resource Include="resources\images\calcToExcel.png" />
+    <Resource Include="resources\images\calcToNewSheetExcel.png" />
     <Resource Include="resources\images\chapter.png" />
     <Resource Include="resources\images\delete_image.png" />
     <Resource Include="resources\images\delete_manufacturer.png" />
     <Resource Include="resources\images\download_to_clipboard.png" />
     <Resource Include="resources\images\download_to_file.png" />
     <Resource Include="resources\images\fast_search.png" />
+    <Resource Include="resources\images\refresh.png" />
     <Resource Include="resources\images\save.png" />
     <Resource Include="resources\images\search.png" />
     <Resource Include="resources\images\sort.png" />
@@ -48,8 +52,6 @@
     <Resource Include="resources\images\upload_from_file.png" />
     <Resource Include="resources\images\without_image_database.png" />
     <Resource Include="resources\images\without_picture.png" />
-    <Resource Include="save.png" />
-    <Resource Include="without_image_database.png" />
   </ItemGroup>
 
 </Project>

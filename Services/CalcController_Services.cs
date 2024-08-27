@@ -44,11 +44,11 @@ namespace Dahmira.Services
                     fullCost += item.TotalCost;
                 }
             }
-
+            CalcGrid.CommitEdit();
             fullCost_label.Content = fullCost;
             CalcGrid.Items.Refresh();
         }
-        public bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, Label fullCost_label, ObservableCollection<CalcProduct> calcItems, int count = 1, string position = "Last")
+        public bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, ObservableCollection<CalcProduct> calcItems, Label fullCost_label, int count = 1, string position = "Last")
         {
             try
             {

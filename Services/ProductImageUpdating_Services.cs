@@ -16,7 +16,7 @@ namespace Dahmira.Services
 {
     internal class ProductImageUpdating_Services : IProductImageUpdating
     {
-        public bool UploadImageFromFile(Image image) //Загрузка картинки из файла
+        public bool UploadImageFromFile(System.Windows.Controls.Image image) //Загрузка картинки из файла
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg|All files (*.*)|*.*"; //фильтрация то какие типы расширений может добавлять и видеть пользователь в проводнике
@@ -32,7 +32,7 @@ namespace Dahmira.Services
             return false;
         }
 
-        public void DownloadImageToFile(Image image) //Сохранение картинки в файл
+        public void DownloadImageToFile(System.Windows.Controls.Image image) //Сохранение картинки в файл
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "PNG Image|*.png|JPEG Image|*.jpg;*.jpeg|All Files|*.*";
@@ -55,12 +55,12 @@ namespace Dahmira.Services
             }
         }
 
-        public void DeleteImage(Image image)  //Удаление картинки
+        public void DeleteImage(System.Windows.Controls.Image image)  //Удаление картинки
         {
             image.Source = new BitmapImage(new Uri("pack://application:,,,/resources/images/without_picture.png"));
         }
 
-        public bool UploadImageFromClipboard(Image image) //Загрузка картинки из буфера обмена
+        public bool UploadImageFromClipboard(System.Windows.Controls.Image image) //Загрузка картинки из буфера обмена
         {
             if (Clipboard.ContainsImage()) //Если в буфере есть изображение
             {
@@ -77,7 +77,7 @@ namespace Dahmira.Services
             return false;
         }
 
-        public void DownloadImageToClipboard(Image image) //Сохранение картинки в буфер обмена
+        public void DownloadImageToClipboard(System.Windows.Controls.Image image) //Сохранение картинки в буфер обмена
         {
             BitmapSource imageSource = (BitmapSource)image.Source;
             Clipboard.SetImage(imageSource);

@@ -102,8 +102,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="46"/>
             <RowDefinition Height="218.009"/>
-            <RowDefinition Height="47*"/>
-            <RowDefinition Height="3*"/>
+            <RowDefinition/>
+            <RowDefinition x:Name="TotalCostRow_row" Height="0"/>
         </Grid.RowDefinitions>
 
         <!--Контур с меню-->
@@ -648,11 +648,11 @@
         </Border>
 
         <!--Контур с БД-->
-        <Border
+        <Border x:Name="dataBaseBorder_border"
             Grid.Row="2"
             Background ="White" 
             CornerRadius="15,15,15,15" 
-            Margin="5,5,5,5" RenderTransformOrigin="0.501,0.554" Grid.RowSpan="2">
+            Margin="5,5,5,5" RenderTransformOrigin="0.501,0.554">
 
             <Grid>
                 <!--Сетка с элементами управлени я основной БД-->
@@ -690,13 +690,12 @@
                         </Button>
 
                         <TextBox x:Name="productNum_textBox" 
-                                 Width="15" 
+                                 Width="Auto" 
                                  Margin="5,11,0,9"
                                  Text="1" 
                                  BorderBrush="White" 
                                  FontFamily="Arial Black" 
                                  Foreground="Gray" 
-                                 TextChanged="productNum_textBox_TextChanged" 
                                  FontSize="16" 
                                  VerticalContentAlignment="Center"
                                  MinWidth="18"
@@ -751,13 +750,16 @@
 
                 <!--Сетка с элементами управления и dataGrid расчётки-->
                 <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Visible">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="953*"/>
+                        <ColumnDefinition Width="957*"/>
+                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="61"/>
-                        <RowDefinition Height="137*"/>
-                        <RowDefinition Height="7*"/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Margin="10,10,10,10" Grid.Row="0" Orientation="Horizontal">
+                    <StackPanel Margin="10,10,10,10" Grid.Row="0" Orientation="Horizontal" Grid.Column="0">
                         <Button x:Name="CalcDeleteSelectedProduct_button"
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="40"
@@ -779,7 +781,7 @@
                                 ToolTip="Обновить ценники в расчетке"
                                 Click="CalcRefresh_button_Click">
 
-                            <Image Source="/refresh.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                            <Image Source="pack://application:,,,/resources/images/refresh.png" Height="32" Width="32" Margin="-30,0,0,0"/>
                         </Button>
 
                         <Button x:Name="CalcChapter_button"
@@ -791,19 +793,49 @@
                                 ToolTip="Создать раздел"
                                 Click="CalcChapter_button_Click">
 
-                            <Image Source="/chapter.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                            <Image Source="pack://application:,,,/resources/images/chapter.png" Height="32" Width="32" Margin="-30,0,0,0"/>
                         </Button>
 
-                        <Label Content="ИМЯ РАЗДЕЛА:" VerticalAlignment="Center" FontFamily="Arial Black" Foreground="Gray"/>
-                        <TextBox x:Name="chapterName_textBox" Text="Раздел"
-                                 Width="100" VerticalAlignment="Center" FontFamily="Arial Black" Foreground="Gray" BorderThickness="1"/>
+                        <Label  Content="ИМЯ РАЗДЕЛА:" Margin="-2,5" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="16" Height="27"/>
 
+                        <TextBox x:Name="chapterName_textBox" Text="Раздел"
+                                 Width="Auto" 
+                                 Margin="0,11,5,9" 
+                                 BorderBrush="White" 
+                                 FontFamily="Arial Black" 
+                                 Foreground="Gray" 
+                                 FontSize="16" 
+                                 VerticalContentAlignment="Center"
+                                 MinWidth="18"
+                                 KeyDown="productNum_textBox_KeyDown"/>
                     </StackPanel>
-                    <DataGrid x:Name="CalcDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,10" Background="White" Foreground="Gray" FontFamily="Arial Black"
+
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="0,10,10,10" HorizontalAlignment="Right" Width="Auto">
+
+                        <Button x:Name="CalcToExcel_button"
+                                Template="{StaticResource btTemplate}" 
+                                Height="40" Width="60"
+                                Background="MediumSeaGreen" 
+                                Margin="0,0,5,0" 
+                                ToolTip="Экспортировать в Excel"
+                                Click="CalcToExcel_button_Click">
+
+                            <Image Source="pack://application:,,,/resources/images/calcToExcel.png" Height="30" Width="50" VerticalAlignment="Top" Margin="-30,0,0,0"/>
+                        </Button>
+                        <Button x:Name="CalcToNewSheetExcel_button"
+                                Template="{StaticResource btTemplate}" 
+                                Height="40" Width="60"
+                                Background="MediumSeaGreen" 
+                                ToolTip="Экспортировать в Excel новым листом">
+
+                            <Image Source="pack://application:,,,/resources/images/calcToNewSheetExcel.png" Height="30" Width="50" VerticalAlignment="Top" Margin="-30,0,0,0"/>
+                        </Button>
+                    </StackPanel>
+                    <DataGrid x:Name="CalcDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="White" Foreground="Gray" FontFamily="Arial Black"
                               RowHeight="30" MinRowHeight="30"
                               CanUserAddRows="False" HorizontalScrollBarVisibility="Disabled" RowHeaderWidth="0"
                               SelectedCellsChanged="CalcdataGrid_SelectedCellsChanged"
-                              CurrentCellChanged="CalcDataGrid_CurrentCellChanged">
+                              CurrentCellChanged="CalcDataGrid_CurrentCellChanged" Grid.ColumnSpan="2">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="№" Binding="{Binding Num, Converter={StaticResource NullToEmptyStringConverter}}" Width="1*" MinWidth="30" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Производитель" Binding="{Binding Manufacturer}" Width="10*" MinWidth="120" IsReadOnly="True"></DataGridTextColumn>
@@ -825,12 +857,15 @@
                             <DataGridTextColumn Header="Примечание"  Binding="{Binding Note}" Width="6*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-
-                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Label x:Name="fullCostType_label"  Content="ИТОГО БЕЗ НДС:" FontFamily="Arial Black" Foreground="Gray" FontSize="17" Height="27"/>
-                        <Label x:Name="fullCost_label" Content="0" FontFamily="Arial Black" Foreground="Gray" FontSize="17" Height="27" Margin="0,0,10,0"/>
-                    </StackPanel>
                 </Grid>
+            </Grid>
+        </Border>
+        <Border Grid.Row="3" Background="White" Margin="5,-5,5,5" CornerRadius="0, 0, 15, 15" BorderThickness="0">
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,-5,0,10">
+                    <Label x:Name="fullCostType" Content="ИТОГО:" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="20" />
+                    <Label x:Name="fullCost" Content="0" Margin="-2,0,10,0" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="20"/>
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>
