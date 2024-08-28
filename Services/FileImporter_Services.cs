@@ -16,11 +16,18 @@ using Microsoft.Win32;
 using Dahmira.Pages;
 using System.Text.Json;
 using System.Windows;
+using System.Net;
+using System.IO.Packaging;
+using System.Text.Json.Serialization;
 
 namespace Dahmira.Services
 {
     public class FileImporter_Services : IFileImporter
     {
+        private string url_praise = "ftp://31.177.95.187";
+        private string ftpUsername = "dahmira1_admin";
+        private string ftpPassword = "zI2Hghfnslob";
+        private string ftpFilePath = "/countries/countriesTest.json";
         void IFileImporter.ExportToExcel(MainWindow window)
         {
             try
@@ -185,8 +192,8 @@ namespace Dahmira.Services
 
         void IFileImporter.ExportToExcelAsNewSheet(MainWindow window)
         {
-            try
-            {
+            //try
+            //{
                 ExcelPackage.LicenseContext = LicenseContext.Commercial;
                 OpenFileDialog openFileDialog = new OpenFileDialog
                 {
@@ -343,11 +350,11 @@ namespace Dahmira.Services
                         package.Save();
                     }
                 }
-            }
-            catch(Exception exp) 
-            {
-                MessageBox.Show(exp.Message);
-            }
+            //}
+            //catch(Exception exp) 
+            //{
+            //    MessageBox.Show(exp.Message);
+            //}
         }
 
         void IFileImporter.ExportToPDF(bool isImporting)
@@ -374,9 +381,120 @@ namespace Dahmira.Services
 
         void IFileImporter.ImportSettingsFromFile(MainWindow window)
         {
-            string jsonString = JsonSerializer.Serialize(window.settings);
-            string filePath = "settings.json";
-            File.WriteAllText(filePath, jsonString);
+            try
+            {
+                string jsonString = JsonSerializer.Serialize(window.settings);
+                string filePath = "settings.json";
+                File.WriteAllText(filePath, jsonString);
+            }
+            catch(Exception exp ) 
+            {
+                MessageBox.Show(exp.Message);
+            }
+        }
+
+        void IFileImporter.ImportCountriesFromFTP()
+        {
+            try
+            {
+                string localJsonString = File.ReadAllText("countries.json");
+                string ftpJsonString = string.Empty;
+
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + ftpFilePath);
+                request.Method = WebRequestMethods.Ftp.DownloadFile;
+                request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+                request.UseBinary = true;
+
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (Stream responseStream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(responseStream))
+                {
+                    // Читаем содержимое потока и конвертируем его в строку
+                    ftpJsonString = reader.ReadToEnd();
+                }
+
+                if (localJsonString != ftpJsonString)
+                {
+                    CountryManager.Instance.countries = JsonSerializer.Deserialize<ObservableCollection<Country>>(ftpJsonString);
+                }
+            }
+            catch(Exception ex ) 
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        void IFileImporter.ExportCountriesToFTP()
+        {
+            try
+            {
+                string jsonString = JsonSerializer.Serialize(CountryManager.Instance.countries);
+
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + ftpFilePath);
+                request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+                request.Method = WebRequestMethods.Ftp.UploadFile;
+
+                byte[] fileBytes = Encoding.UTF8.GetBytes(jsonString);
+
+                using (Stream requestStream = request.GetRequestStream())
+                {
+                    requestStream.Write(fileBytes, 0, fileBytes.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        void IFileImporter.ExportCalcToFile(MainWindow window)
+        {
+            var options = new JsonSerializerOptions
+            {
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+            };
+
+            string jsonString = JsonSerializer.Serialize(window.calcItems, options);
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "Json Files (*.json)|*.json",
+                Title = "Сохранить json файл",
+                InitialDirectory = window.settings.CalcFolderPath
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string filePath = saveFileDialog.FileName;
+                File.WriteAllText(filePath, jsonString);
+            }
+        }
+
+        void IFileImporter.ImportCalcFromFile(MainWindow window)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "Json Files (*.json)|*.json",
+                Title = "Сохранить json файл",
+                InitialDirectory = window.settings.CalcFolderPath
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string filePath = openFileDialog.FileName;
+                string jsonString = File.ReadAllText(filePath);
+                window.calcItems.Clear();
+                var options = new JsonSerializerOptions
+                {
+                    NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+                };
+                var newItems = JsonSerializer.Deserialize<ObservableCollection<CalcProduct>>(jsonString, options);
+                window.calcItems.Clear();
+                foreach (var item in newItems)
+                {
+                    window.calcItems.Add(item);
+                }
+            }
         }
     }
 }

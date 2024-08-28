@@ -109,7 +109,12 @@
         <!--Контур с меню-->
         <Border BorderBrush="Black" CornerRadius="15,15,15,15" Background="White" Margin="5,10,5,5">
             <Menu Background="Transparent" Margin="15,0,21,0">
-                <MenuItem Header="ФАЙЛ" Height="32" FontFamily="Arial Black" Foreground="#FF585454"></MenuItem>
+                <MenuItem Header="ФАЙЛ" Height="32" FontFamily="Arial Black" Foreground="#FF585454">
+                    <MenuItem x:Name="newCalc_menuItem" Header="Новый расчёт" ></MenuItem>
+                    <MenuItem x:Name="openCalc_menuItem" Header="Загрузить расчёт" Click="openCalc_menuItem_Click"></MenuItem>
+                    <MenuItem x:Name="saveCaalc_menuItem" Header="Сохранить расчёт" Click="saveCaalc_menuItem_Click" ></MenuItem>
+                    <MenuItem x:Name="saveCalcAs_menuItem" Header="Сохранить расчёт как..." ></MenuItem>
+                </MenuItem>
                 <MenuItem Header="ДАННЫЕ" Foreground="#FF585454" FontFamily="Arial Black" ></MenuItem>
                 <MenuItem Header="НАСТРОЙКИ" Foreground="#FF585454" FontFamily="Arial Black" >
                     <MenuItem Header="Настройки обновления цен из EXCEL" ></MenuItem>

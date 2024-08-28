@@ -50,6 +50,7 @@ namespace Dahmira
             this.WindowState = WindowState.Maximized; // Разворачиваем окно на весь экран
             fileImporter.ExportSettingsOnFile(this);
             fullCostType.Content = settings.TotalCostValue;
+            fileImporter.ImportCountriesFromFTP();
 
             try
             {
@@ -654,6 +655,17 @@ namespace Dahmira
         private void Window_Closed(object sender, EventArgs e)
         {
             fileImporter.ImportSettingsFromFile(this);
+            fileImporter.ExportCountriesToFTP();
+        }
+
+        private void saveCaalc_menuItem_Click(object sender, RoutedEventArgs e)
+        {
+            fileImporter.ExportCalcToFile(this);
+        }
+
+        private void openCalc_menuItem_Click(object sender, RoutedEventArgs e)
+        {
+            fileImporter.ImportCalcFromFile(this);
         }
     }
 

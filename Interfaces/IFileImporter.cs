@@ -13,5 +13,9 @@ namespace Dahmira.Interfaces
         public void ExportToPDF(bool isImporting);
         public void ExportSettingsOnFile(MainWindow window);
         public void ImportSettingsFromFile(MainWindow window);
+        public void ExportCountriesToFTP();
+        public void ImportCountriesFromFTP();
+        public void ExportCalcToFile(MainWindow window);
+        public void ImportCalcFromFile(MainWindow window);
     }
 }

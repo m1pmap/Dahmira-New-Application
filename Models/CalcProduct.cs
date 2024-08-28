@@ -9,19 +9,19 @@ namespace Dahmira.Models
 {
     public class CalcProduct
     {
-        public int Num { get; set; }
-        public string Manufacturer {  get; set; }
-        public string ProductName { get; set; }
-        public string Article { get; set; }
-        public string Unit {  get; set; }
-        public byte[] Photo { get; set; }
-        public double RealCost { get; set; }
-        public double Cost { get; set; }
-        public int Count { get; set; }
-        public double TotalCost { get; set; }
-        public int ID { get; set; }
-        public int ID_Art {  get; set; }
-        public string Note {  get; set; }
+        public int Num { get; set; } = 0;
+        public string Manufacturer {  get; set; } = string.Empty;
+        public string ProductName { get; set; } = string.Empty;
+        public string Article { get; set; } = string.Empty;
+        public string Unit { get; set; } = string.Empty;
+        public byte[] Photo { get; set; } = null;
+        public double RealCost { get; set; } = double.NaN;
+        public double Cost { get; set; } = double.NaN;
+        public int Count { get; set; } = 0;
+        public double TotalCost { get; set; } = double.NaN;
+        public int ID { get; set; } = 0;
+        public int ID_Art { get; set; } = 0;
+        public string Note { get; set; } = string.Empty;
 
     }
 }
