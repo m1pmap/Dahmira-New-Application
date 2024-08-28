@@ -23,6 +23,7 @@ using OfficeOpenXml;
 using OfficeOpenXml.Drawing;
 using OfficeOpenXml.Style;
 using System.Text;
+using System.Text.Json;
 
 namespace Dahmira
 {
@@ -34,6 +35,7 @@ namespace Dahmira
         private IProductImageUpdating ImageUpdater = new ProductImageUpdating_Services();//Для работы с загрузкой/удалением/сохранением картинки в файл/буфер
         private ICalcController CalcController = new CalcController_Services();//Для работы с обновлением/добавлением в расчётку
         private ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services(); //???Для Конвертации изображения в массив байтов и обратно???
+        private IFileImporter fileImporter = new FileImporter_Services();
         public SettingsParameters settings = new SettingsParameters();
 
         int oldCurrentProductIndex = 0; //Прошлый выбранный элемент в dataBaseGrid
@@ -46,9 +48,13 @@ namespace Dahmira
             InitializeComponent();
 
             this.WindowState = WindowState.Maximized; // Разворачиваем окно на весь экран
+            fileImporter.ExportSettingsOnFile(this);
+            fullCostType.Content = settings.TotalCostValue;
 
             try
             {
+                //Получение настроек пользователя
+
                 //Пробное наполнение dataBaseGrid 
                 items = new ObservableCollection<TestData>()
                 {
@@ -91,6 +97,8 @@ namespace Dahmira
                 allCountries_comboBox.ItemsSource = CountryManager.Instance.countries;
 
                 CalcDataGrid.ItemsSource = calcItems;
+
+                
             }
             catch (Exception e) { MessageBox.Show(e.Message); }
         }
@@ -635,28 +643,17 @@ namespace Dahmira
 
         private void CalcToExcel_button_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                IFileImporter importer = new FileImporter_Services();
-                importer.ImportToExcel(this);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
+            fileImporter.ExportToExcel(this);
         }
 
         private void CalcToNewSheetExcel_button_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                IFileImporter importer = new FileImporter_Services();
-                importer.ImportToExcelAsNewSheet(this);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(exception.Message);
-            }
+            fileImporter.ExportToExcelAsNewSheet(this);
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            fileImporter.ImportSettingsFromFile(this);
         }
     }
 

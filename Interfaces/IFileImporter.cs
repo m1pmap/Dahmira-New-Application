@@ -8,8 +8,10 @@ namespace Dahmira.Interfaces
 {
     public interface IFileImporter
     {
-        public void ImportToExcel(MainWindow window);
-        public void ImportToExcelAsNewSheet(MainWindow window);
-        public void ImportToPDF(bool isImporting);
+        public void ExportToExcel(MainWindow window);
+        public void ExportToExcelAsNewSheet(MainWindow window);
+        public void ExportToPDF(bool isImporting);
+        public void ExportSettingsOnFile(MainWindow window);
+        public void ImportSettingsFromFile(MainWindow window);
     }
 }
