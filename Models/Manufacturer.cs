@@ -8,7 +8,7 @@ namespace Dahmira.Models
 {
     public class Manufacturer
     {
-        public string name { get; set; }
+        public string name { get; set; } //Имя страны
 
         public override bool Equals(object obj)
         {

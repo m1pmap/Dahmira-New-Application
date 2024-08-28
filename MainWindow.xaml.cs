@@ -49,7 +49,7 @@ namespace Dahmira
 
             this.WindowState = WindowState.Maximized; // Разворачиваем окно на весь экран
             fileImporter.ExportSettingsOnFile(this);
-            fullCostType.Content = settings.TotalCostValue;
+            fullCostType.Content = settings.FullCostType;
             fileImporter.ImportCountriesFromFTP();
 
             try
@@ -364,7 +364,7 @@ namespace Dahmira
         {
             SimpleSettings simpleSettings = new SimpleSettings(settings, this);
             simpleSettings.ShowDialog();
-            fullCostType.Content = settings.TotalCostValue;
+            fullCostType.Content = settings.FullCostType;
         }
 
         private void priceCalcButton_Click(object sender, RoutedEventArgs e) //Переход на прайс и расчётку
@@ -666,6 +666,7 @@ namespace Dahmira
         private void openCalc_menuItem_Click(object sender, RoutedEventArgs e)
         {
             fileImporter.ImportCalcFromFile(this);
+            CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
         }
     }
 

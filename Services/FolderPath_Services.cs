@@ -7,7 +7,7 @@ namespace Dahmira.Services
 {
     public class FolderPath_Services : IFolderPath
     {
-        void IFolderPath.SelectedFolderPathToTextBox(TextBox textBox)
+        void IFolderPath.SelectedFolderPathToTextBox(TextBox textBox) //Отображение выбранного пути в выбраном textBox
         {
             var openFileDialog = new OpenFileDialog
             {

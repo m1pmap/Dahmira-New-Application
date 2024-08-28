@@ -10,7 +10,7 @@ namespace Dahmira.Services
 {
     internal class NullToEmptyStringConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture) //Конвертер нулевого значения в пустую строку
         {
             // Проверяем, является ли значение null
             if (value == null || 

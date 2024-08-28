@@ -28,12 +28,13 @@ namespace Dahmira.Services
         private string ftpUsername = "dahmira1_admin";
         private string ftpPassword = "zI2Hghfnslob";
         private string ftpFilePath = "/countries/countriesTest.json";
-        void IFileImporter.ExportToExcel(MainWindow window)
+        void IFileImporter.ExportToExcel(MainWindow window) //Экспорт расчётки в Excel
         {
             try
             {
-                ExcelPackage.LicenseContext = LicenseContext.Commercial;
-                var package = new ExcelPackage();
+                ExcelPackage.LicenseContext = LicenseContext.Commercial; //Вид лицензии
+
+                var package = new ExcelPackage(); //Создание нового документа
                 var worksheet = package.Workbook.Worksheets.Add("Лист1");
                 int lastColumnIndex = 10;
 
@@ -60,14 +61,14 @@ namespace Dahmira.Services
                 //Установка стилей для Header 
                 ExcelRange titleRange = worksheet.Cells[1, 1, 1, lastColumnIndex];
                 titleRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                titleRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelTitleColor.Color);
+                titleRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelTitleColor.GetColor());
 
                 //Установка стилей для всего рабочего пространства
                 ExcelRange Rng = worksheet.Cells[1, 1, window.calcItems.Count + 2, lastColumnIndex];
                 Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 Rng.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 Rng.Style.WrapText = true;
-
+                
                 Rng.Style.Border.Top.Style = ExcelBorderStyle.Thin;
                 Rng.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
                 Rng.Style.Border.Left.Style = ExcelBorderStyle.Thin;
@@ -99,7 +100,7 @@ namespace Dahmira.Services
                         //Стили для раздела
                         ExcelRange chapterRange = worksheet.Cells[i + 2, 1, i + 2, lastColumnIndex];
                         chapterRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        chapterRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelChapterColor.Color);
+                        chapterRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelChapterColor.GetColor());
                         chapterRange.Merge = true;
                         worksheet.Cells[i + 2, 1].Value = item.Manufacturer;
                         continue;
@@ -108,17 +109,17 @@ namespace Dahmira.Services
                     //Установка стилей всех данных
                     ExcelRange dataRange = worksheet.Cells[i + 2, 1, i + 2, lastColumnIndex];
                     dataRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    dataRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelDataColor.Color);
+                    dataRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelDataColor.GetColor());
 
                     //Установка стилей для примечаний
                     ExcelRange notesRange = worksheet.Cells[i + 2, lastColumnIndex];
                     notesRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    notesRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelNotesColor.Color);
+                    notesRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelNotesColor.GetColor());
 
                     //Установка стилей для номера
                     ExcelRange numberRange = worksheet.Cells[i + 2, 1];
                     numberRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    numberRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelNumberColor.Color);
+                    numberRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelNumberColor.GetColor());
 
                     //Добавление данных в ячейки
                     worksheet.Cells[i + 2, 1].Value = item.Num;
@@ -132,15 +133,15 @@ namespace Dahmira.Services
                         //Установка стилей для фона фото 
                         ExcelRange photoRange = worksheet.Cells[i + 2, 6];
                         photoRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        photoRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelPhotoBackgroundColor.Color);
+                        photoRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelPhotoBackgroundColor.GetColor());
 
                         ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services();
 
                         BitmapImage bitmapImage = (BitmapImage)converter.Convert(item.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
 
                         //Ширина и высота в зависимости от выбранных параметров в настройках
-                        worksheet.Column(6).Width = (window.settings.MaxExcelPhotoWidth + 10) / 7;
-                        worksheet.Rows[i + 2].Height = (window.settings.MaxExcelPhotoHeight + 10) / 1.33;
+                        worksheet.Column(6).Width = (window.settings.ExcelPhotoWidth + 10) / 7;
+                        worksheet.Rows[i + 2].Height = (window.settings.ExcelPhotoHeight + 10) / 1.33;
 
                         //MemoryStream для создания временного файла для дальнейшей конвертации в FileInfo
                         using (var memoryStream = new MemoryStream())
@@ -156,7 +157,7 @@ namespace Dahmira.Services
                             //Добавление изображения в Excel
                             var excelImage = worksheet.Drawings.AddPicture(i.ToString(), memoryStream);
                             excelImage.SetPosition(i + 1, 3, 5, 3);
-                            excelImage.SetSize(window.settings.MaxExcelPhotoWidth, window.settings.MaxExcelPhotoHeight);
+                            excelImage.SetSize(window.settings.ExcelPhotoWidth, window.settings.ExcelPhotoHeight);
                         }
                     }
 
@@ -167,15 +168,16 @@ namespace Dahmira.Services
                     worksheet.Cells[i + 2, lastColumnIndex].Value = item.Note;
                 }
 
-                worksheet.Cells[window.calcItems.Count + 2, lastColumnIndex - 1].Value = window.settings.TotalCostValue + " " + window.fullCost.Content;
+                worksheet.Cells[window.calcItems.Count + 2, lastColumnIndex - 1].Value = window.settings.FullCostType + " " + window.fullCost.Content;
 
+                //Диалоговое окно для сохранения
                 SaveFileDialog saveFileDialog = new SaveFileDialog
                 {
                     Filter = "Excel Files (*.xlsx)|*.xlsx",
                     Title = "Сохранить Excel документ",
                     InitialDirectory = window.settings.ExcelFolderPath
                 };
-
+                //Сохранение по выбранному пути
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     string filePath = saveFileDialog.FileName;
@@ -190,11 +192,12 @@ namespace Dahmira.Services
             }
         }
 
-        void IFileImporter.ExportToExcelAsNewSheet(MainWindow window)
+        void IFileImporter.ExportToExcelAsNewSheet(MainWindow window) //Экспорт расчётки в Excel в качестве нового листа
         {
-            //try
-            //{
-                ExcelPackage.LicenseContext = LicenseContext.Commercial;
+            try
+            {
+                ExcelPackage.LicenseContext = LicenseContext.Commercial; //Лицензия
+                //Диалоговое окно открытия файла
                 OpenFileDialog openFileDialog = new OpenFileDialog
                 {
                     Filter = "Excel Files (*.xlsx)|*.xlsx",
@@ -204,6 +207,7 @@ namespace Dahmira.Services
 
                 if (openFileDialog.ShowDialog() == true)
                 {
+                    //Диалоговое окно для того чтобы узнать имя нового листа Excel
                     DialogPage dialogPage = new DialogPage();
                     dialogPage.ShowDialog();
 
@@ -238,7 +242,7 @@ namespace Dahmira.Services
                         //Установка стилей для Header 
                         ExcelRange titleRange = worksheet.Cells[1, 1, 1, lastColumnIndex];
                         titleRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        titleRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelTitleColor.Color);
+                        titleRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelTitleColor.GetColor());
 
                         //Установка стилей для всего рабочего пространства
                         ExcelRange Rng = worksheet.Cells[1, 1, window.calcItems.Count + 2, lastColumnIndex];
@@ -277,7 +281,7 @@ namespace Dahmira.Services
                                 //Стили для раздела
                                 ExcelRange chapterRange = worksheet.Cells[i + 2, 1, i + 2, lastColumnIndex];
                                 chapterRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                chapterRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelChapterColor.Color);
+                                chapterRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelChapterColor.GetColor());
                                 chapterRange.Merge = true;
                                 worksheet.Cells[i + 2, 1].Value = item.Manufacturer;
                                 continue;
@@ -286,17 +290,17 @@ namespace Dahmira.Services
                             //Установка стилей всех данных
                             ExcelRange dataRange = worksheet.Cells[i + 2, 1, i + 2, lastColumnIndex];
                             dataRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            dataRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelDataColor.Color);
+                            dataRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelDataColor.GetColor());
 
                             //Установка стилей для примечаний
                             ExcelRange notesRange = worksheet.Cells[i + 2, lastColumnIndex];
                             notesRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            notesRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelNotesColor.Color);
+                            notesRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelNotesColor.GetColor());
 
                             //Установка стилей для номера
                             ExcelRange numberRange = worksheet.Cells[i + 2, 1];
                             numberRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                            numberRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelNumberColor.Color);
+                            numberRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelNumberColor.GetColor());
 
                             //Добавление данных в ячейки
                             worksheet.Cells[i + 2, 1].Value = item.Num;
@@ -310,15 +314,15 @@ namespace Dahmira.Services
                                 //Установка стилей для фона фото 
                                 ExcelRange photoRange = worksheet.Cells[i + 2, 6];
                                 photoRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                photoRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelPhotoBackgroundColor.Color);
+                                photoRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelPhotoBackgroundColor.GetColor());
 
                                 ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services();
 
                                 BitmapImage bitmapImage = (BitmapImage)converter.Convert(item.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
 
                                 //Ширина и высота в зависимости от выбранных параметров в настройках
-                                worksheet.Column(6).Width = (window.settings.MaxExcelPhotoWidth + 10) / 7;
-                                worksheet.Rows[i + 2].Height = (window.settings.MaxExcelPhotoHeight + 10) / 1.33;
+                                worksheet.Column(6).Width = (window.settings.ExcelPhotoWidth + 10) / 7;
+                                worksheet.Rows[i + 2].Height = (window.settings.ExcelPhotoHeight + 10) / 1.33;
 
                                 //MemoryStream для создания временного файла для дальнейшей конвертации в FileInfo
                                 using (var memoryStream = new MemoryStream())
@@ -334,7 +338,7 @@ namespace Dahmira.Services
                                     //Добавление изображения в Excel
                                     var excelImage = worksheet.Drawings.AddPicture(i.ToString(), memoryStream);
                                     excelImage.SetPosition(i + 1, 3, 5, 3);
-                                    excelImage.SetSize(window.settings.MaxExcelPhotoWidth, window.settings.MaxExcelPhotoHeight);
+                                    excelImage.SetSize(window.settings.ExcelPhotoWidth, window.settings.ExcelPhotoHeight);
                                 }
                             }
 
@@ -345,24 +349,24 @@ namespace Dahmira.Services
                             worksheet.Cells[i + 2, lastColumnIndex].Value = item.Note;
                         }
 
-                        worksheet.Cells[window.calcItems.Count + 2, lastColumnIndex - 1].Value = window.settings.TotalCostValue + " " + window.fullCost.Content;
+                        worksheet.Cells[window.calcItems.Count + 2, lastColumnIndex - 1].Value = window.settings.FullCostType+ " " + window.fullCost.Content;
 
                         package.Save();
                     }
                 }
-            //}
-            //catch(Exception exp) 
-            //{
-            //    MessageBox.Show(exp.Message);
-            //}
         }
+            catch(Exception exp) 
+            {
+                MessageBox.Show(exp.Message);
+            }
+}
 
-        void IFileImporter.ExportToPDF(bool isImporting)
+        void IFileImporter.ExportToPDF(bool isImporting) //Экспорт в PDF
         {
             throw new NotImplementedException();
         }
 
-        void IFileImporter.ExportSettingsOnFile(MainWindow window)
+        void IFileImporter.ExportSettingsOnFile(MainWindow window) //Экспорт настроек в файл
         {
             try
             {
@@ -379,7 +383,7 @@ namespace Dahmira.Services
             }
         }
 
-        void IFileImporter.ImportSettingsFromFile(MainWindow window)
+        void IFileImporter.ImportSettingsFromFile(MainWindow window) //Импорт настроек из файла
         {
             try
             {
@@ -393,7 +397,7 @@ namespace Dahmira.Services
             }
         }
 
-        void IFileImporter.ImportCountriesFromFTP()
+        void IFileImporter.ImportCountriesFromFTP() //Импорт стран с фтп сервера
         {
             try
             {
@@ -424,7 +428,7 @@ namespace Dahmira.Services
             }
         }
 
-        void IFileImporter.ExportCountriesToFTP()
+        void IFileImporter.ExportCountriesToFTP() //Экспорт стран на фтп сервера
         {
             try
             {
@@ -447,7 +451,7 @@ namespace Dahmira.Services
             }
         }
 
-        void IFileImporter.ExportCalcToFile(MainWindow window)
+        void IFileImporter.ExportCalcToFile(MainWindow window) //Экспорт расчётки в файл
         {
             var options = new JsonSerializerOptions
             {
@@ -470,7 +474,7 @@ namespace Dahmira.Services
             }
         }
 
-        void IFileImporter.ImportCalcFromFile(MainWindow window)
+        void IFileImporter.ImportCalcFromFile(MainWindow window) //Испорт расчётки из файла
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {

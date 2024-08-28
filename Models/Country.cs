@@ -9,10 +9,10 @@ namespace Dahmira.Models
 {
     public class Country
     {
-        public string name { get; set; }
-        public double coefficient { get; set; }
-        public double discount { get; set; }
-        public ObservableCollection<Manufacturer> manufacturers { get; set; }
+        public string name { get; set; } //Название страны
+        public double coefficient { get; set; } //Коэфф
+        public double discount { get; set; } //Скидка
+        public ObservableCollection<Manufacturer> manufacturers { get; set; } //Местные поставщики
 
         public Country()
         {

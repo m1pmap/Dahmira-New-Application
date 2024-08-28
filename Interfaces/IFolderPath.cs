@@ -9,6 +9,6 @@ namespace Dahmira.Interfaces
 {
     public interface IFolderPath
     {
-        void SelectedFolderPathToTextBox(TextBox textBox);
+        void SelectedFolderPathToTextBox(TextBox textBox); //Отображение выбранного пути в выбраном textBox
     }
 }

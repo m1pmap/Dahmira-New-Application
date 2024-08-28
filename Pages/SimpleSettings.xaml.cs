@@ -42,12 +42,12 @@ namespace Dahmira.Pages
             CountryDataGrid.ItemsSource = CountryManager.Instance.countries;
             colors = new ObservableCollection<ColorItem>
             {
-                new ColorItem { Name = "Красный", Color = System.Drawing.Color.Red },
-                new ColorItem { Name = "Зелёный", Color = System.Drawing.Color.MediumSeaGreen },
-                new ColorItem { Name = "Синий", Color = System.Drawing.Color.Blue },
-                new ColorItem { Name = "Жёлтый", Color = System.Drawing.Color.LightYellow },
-                new ColorItem { Name = "Прозрачный", Color = System.Drawing.Color.Transparent }
-            };
+                new ColorItem("Красный", System.Drawing.Color.Red),
+                new ColorItem ("Зелёный", System.Drawing.Color.MediumSeaGreen),
+                new ColorItem ("Синий", System.Drawing.Color.Blue),
+                new ColorItem ("Жёлтый", System.Drawing.Color.LightYellow),
+                new ColorItem ("Прозрачный", System.Drawing.Color.Transparent)
+            };  
             //Цвета для comboBox, отвечающие за настройку Excel
             ExcelTitleColors_comboBox.ItemsSource = colors;
             ExcelChapterColors_comboBox.ItemsSource = colors;
@@ -91,11 +91,11 @@ namespace Dahmira.Pages
             ComboBoxItemCompare(ExcelNotesColors_comboBox, settings.ExcelNotesColor);
             ComboBoxItemCompare(ExcelNumberColors_comboBox, settings.ExcelNumberColor);
             IsInsertExcelPicture_textBox.IsChecked = settings.IsInsertExcelPicture;
-            maxExcelImageWidth.Text = settings.MaxExcelPhotoWidth.ToString();
-            maxExcelImageHeight.Text = settings.MaxExcelPhotoHeight.ToString();
-            TotalCostValue_comboBox.SelectedItem = TotalCostValue_comboBox.Items
+            ExcelImageWidth.Text = settings.ExcelPhotoWidth.ToString();
+            ExcelImageHeight.Text = settings.ExcelPhotoHeight.ToString();
+            FullCostType_comboBox.SelectedItem = FullCostType_comboBox.Items
                 .Cast<ComboBoxItem>()
-                .FirstOrDefault(i => i.Content.ToString() == settings.TotalCostValue);
+                .FirstOrDefault(i => i.Content.ToString() == settings.FullCostType);
 
             //Вывод данных в PDF
             ComboBoxItemCompare(pdfHeaderColors_comboBox, settings.PdfHeaderColor);
@@ -204,7 +204,7 @@ namespace Dahmira.Pages
 
         private void AdministratorPasswordCheck_button_Click(object sender, RoutedEventArgs e) //Проверка введённого пароля администратора
         {
-            if(AdministratorPassword_passwordBox.Password == "Administrator2024")
+            if(AdministratorPassword_passwordBox.Password == "Administrator2024") //Если пароль верный
             {
                 AdministratingStatus_label.Content = "вы Администратор";
                 AdministratingStatus_label.Foreground = new SolidColorBrush(Colors.MediumSeaGreen);
@@ -221,44 +221,44 @@ namespace Dahmira.Pages
             }
         }
 
-        private void AddPriceFolderPath_button_Click(object sender, RoutedEventArgs e)
+        private void AddPriceFolderPath_button_Click(object sender, RoutedEventArgs e)  //Добавление пути к прайсу
         {
             pathFolderController.SelectedFolderPathToTextBox(PriceFolderPath_textBox);
         }
 
-        private void DeletePriceFolderPath_button_Click(object sender, RoutedEventArgs e)
+        private void DeletePriceFolderPath_button_Click(object sender, RoutedEventArgs e) //Удаление пути к прайсу
         {
-            PriceFolderPath_textBox.Text = string.Empty;
+            PriceFolderPath_textBox.Text = "D:\\";
         }
 
-        private void ExcelImportFolderPath_button_Click(object sender, RoutedEventArgs e)
+        private void ExcelImportFolderPath_button_Click(object sender, RoutedEventArgs e) //Добавление пути к Excel
         {
             pathFolderController.SelectedFolderPathToTextBox(ExcelImportFolderPath_textBox);
         }
 
-        private void DeleteExcelImportFolderPath_button_Click(object sender, RoutedEventArgs e)
+        private void DeleteExcelImportFolderPath_button_Click(object sender, RoutedEventArgs e) //Удаление пути к Excel
         {
-            ExcelImportFolderPath_textBox.Text = string.Empty;
+            ExcelImportFolderPath_textBox.Text = "D:\\";
         }
 
-        private void PDFImportFolderPath_button_Click(object sender, RoutedEventArgs e)
+        private void PDFImportFolderPath_button_Click(object sender, RoutedEventArgs e) //Добавление пути к PDF
         {
             pathFolderController.SelectedFolderPathToTextBox(PDFImportFolderPath_textBox);
         }
 
-        private void DeletePDFImportFolderPath_button_Click(object sender, RoutedEventArgs e)
+        private void DeletePDFImportFolderPath_button_Click(object sender, RoutedEventArgs e) //Удаление пути к PDF
         {
-            PDFImportFolderPath_textBox.Text = string.Empty;
+            PDFImportFolderPath_textBox.Text = "D:\\";
         }
 
-        private void CalcImportFolderPath_button_Click(object sender, RoutedEventArgs e)
+        private void CalcImportFolderPath_button_Click(object sender, RoutedEventArgs e) //Добавление пути к расчётке
         {
             pathFolderController.SelectedFolderPathToTextBox(CalcImportFolderPath_textBox);
         }
 
-        private void DeleteCalcImportFolderPath_button_Click(object sender, RoutedEventArgs e)
+        private void DeleteCalcImportFolderPath_button_Click(object sender, RoutedEventArgs e) //Удаление пути к расчётке
         {
-            CalcImportFolderPath_textBox.Text = string.Empty;
+            CalcImportFolderPath_textBox.Text = "D:\\";
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -273,12 +273,13 @@ namespace Dahmira.Pages
             settings.ExcelTitleColor = (ColorItem)ExcelTitleColors_comboBox.SelectedItem;
             settings.ExcelChapterColor = (ColorItem)ExcelChapterColors_comboBox.SelectedItem;
             settings.ExcelDataColor = (ColorItem)ExcelDataColors_comboBox.SelectedItem;
+            settings.ExcelNotesColor = (ColorItem)ExcelNotesColors_comboBox.SelectedItem;
             settings.ExcelPhotoBackgroundColor = (ColorItem)ExcelPhotoBackgroundColors_comboBox.SelectedItem;
             settings.ExcelNumberColor = (ColorItem)ExcelNumberColors_comboBox.SelectedItem;
             settings.IsInsertExcelPicture = IsInsertExcelPicture_textBox.IsChecked;
-            settings.MaxExcelPhotoWidth = Convert.ToInt32(maxExcelImageWidth.Text);
-            settings.MaxExcelPhotoHeight = Convert.ToInt32(maxExcelImageHeight.Text);
-            settings.TotalCostValue = TotalCostValue_comboBox.Text;
+            settings.ExcelPhotoWidth = Convert.ToInt32(ExcelImageWidth.Text);
+            settings.ExcelPhotoHeight = Convert.ToInt32(ExcelImageHeight.Text);
+            settings.FullCostType = FullCostType_comboBox.Text;
 
             //Вывод данных в PDF
             settings.PdfHeaderColor = (ColorItem)pdfHeaderColors_comboBox.SelectedItem;

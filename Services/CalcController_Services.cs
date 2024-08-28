@@ -25,7 +25,7 @@ namespace Dahmira.Services
                 item.TotalCost = Math.Round(item.Cost * item.Count, 2); //Обновление итоговой цены
                 if (item.Num != i + 1) //Если номер идёт не по порядку
                 {
-                    if (item.Num == 0)
+                    if (item.Num == 0) //Если это раздел
                     {
                         chapterCount++;
                     }
@@ -39,7 +39,7 @@ namespace Dahmira.Services
                     item.Num = i + 1 - chapterCount;
                 }
 
-                if(item.TotalCost > 0)
+                if(item.TotalCost > 0) //Если цена положительная
                 {
                     fullCost += item.TotalCost;
                 }
@@ -48,7 +48,7 @@ namespace Dahmira.Services
             fullCost_label.Content = fullCost;
             CalcGrid.Items.Refresh();
         }
-        public bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, ObservableCollection<CalcProduct> calcItems, Label fullCost_label, int count = 1, string position = "Last")
+        public bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, ObservableCollection<CalcProduct> calcItems, Label fullCost_label, int count = 1, string position = "Last") //Добавление в расчётку товара
         {
             try
             {
@@ -106,7 +106,7 @@ namespace Dahmira.Services
             }            
         }
 
-        public void ObjectFlashing(Button target, Color initialColor, Color flashingColor)
+        public void ObjectFlashing(Button target, Color initialColor, Color flashingColor) //Анимация мигания выбранной кнопки и выбранными цветами
         {
             // Создаем анимацию
             var storyboard = new Storyboard();
