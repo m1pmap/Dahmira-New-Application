@@ -110,10 +110,9 @@
         <Border BorderBrush="Black" CornerRadius="15,15,15,15" Background="White" Margin="5,10,5,5">
             <Menu Background="Transparent" Margin="15,0,21,0">
                 <MenuItem Header="ФАЙЛ" Height="32" FontFamily="Arial Black" Foreground="#FF585454">
-                    <MenuItem x:Name="newCalc_menuItem" Header="Новый расчёт" ></MenuItem>
+                    <MenuItem x:Name="newCalc_menuItem" Header="Новый расчёт" Click="newCalc_menuItem_Click"></MenuItem>
                     <MenuItem x:Name="openCalc_menuItem" Header="Загрузить расчёт" Click="openCalc_menuItem_Click"></MenuItem>
                     <MenuItem x:Name="saveCaalc_menuItem" Header="Сохранить расчёт" Click="saveCaalc_menuItem_Click" ></MenuItem>
-                    <MenuItem x:Name="saveCalcAs_menuItem" Header="Сохранить расчёт как..." ></MenuItem>
                 </MenuItem>
                 <MenuItem Header="ДАННЫЕ" Foreground="#FF585454" FontFamily="Arial Black" ></MenuItem>
                 <MenuItem Header="НАСТРОЙКИ" Foreground="#FF585454" FontFamily="Arial Black" >
@@ -299,7 +298,7 @@
                 </Grid>
 
                 <!--Сетка с функционалом поиска и добавления в расчётку-->
-                <Grid x:Name="searchGrid" Visibility="Visible" Grid.Row="1" Margin="5,0,0,0">
+                <Grid x:Name="searchGrid" Visibility="Hidden" Grid.Row="1" Margin="5,0,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="27.001"/>
                         <RowDefinition Height="21"/>
@@ -499,7 +498,7 @@
                            Foreground="Gray" FontSize="14" Grid.Column="8" Grid.Row="2" HorizontalAlignment="Center" HorizontalContentAlignment="Right"/>
 
                     <TextBox x:Name="ManufacturerInformation_textBox" 
-                             Foreground="#FF565353" FontFamily="Arial Black" Grid.Row="2" Grid.Column="9" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="16" 
+                             Foreground="Gray" FontFamily="Arial Black" Grid.Row="2" Grid.Column="9" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="16" 
                              LostFocus="Information_textBox_LostFocus"/>
 
                     <Label Content="НАИМЕНОВАНИЕ:" 
@@ -521,15 +520,15 @@
                             Foreground="Gray" FontSize="14" Grid.Row="4" HorizontalContentAlignment="Right" Grid.Column="9" Margin="127,19,59,0" Grid.RowSpan="2"/>
 
                     <TextBox x:Name="ProductNameInformation_textBox"
-                             Grid.Row="3" Foreground="#FF565353" FontFamily="Arial Black" Grid.Column="9" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="16"
+                             Grid.Row="3" Foreground="Gray" FontFamily="Arial Black" Grid.Column="9" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="16"
                              LostFocus="Information_textBox_LostFocus"/>
 
                     <TextBox x:Name="ArticleInformation_textBox"
-                             Grid.Row="4" Foreground="#FF565353" FontFamily="Arial Black" Grid.Column="9" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="16"
+                             Grid.Row="4" Foreground="Gray" FontFamily="Arial Black" Grid.Column="9" Grid.ColumnSpan="2" VerticalAlignment="Center" Height="16"
                              LostFocus="Information_textBox_LostFocus"/>
 
                     <TextBox x:Name="UnitInformation_textBox"
-                             Grid.Row="5" Margin="271,2,0,0" Foreground="#FF565353" FontFamily="Arial Black" Grid.Column="9" Grid.ColumnSpan="2" VerticalAlignment="Top" Height="16"
+                             Grid.Row="5" Margin="271,2,0,0" Foreground="Gray" FontFamily="Arial Black" Grid.Column="9" Grid.ColumnSpan="2" VerticalAlignment="Top" Height="16"
                              LostFocus="Information_textBox_LostFocus"/>
 
                     <Label  Content="ЦЕНА:" 
@@ -539,7 +538,7 @@
                             Foreground="Gray" FontSize="14" Grid.Row="4" HorizontalContentAlignment="Right" Grid.Column="8" Margin="14,19,0,0" Grid.RowSpan="2"/>
 
                     <TextBox x:Name="CostInformation_textBox"
-                             Grid.Row="5" Margin="0,2,208,0" Foreground="#FF565353" FontFamily="Arial Black" Grid.Column="9" VerticalAlignment="Top" Height="16"
+                             Grid.Row="5" Margin="0,2,208,0" Foreground="Gray" FontFamily="Arial Black" Grid.Column="9" VerticalAlignment="Top" Height="16"
                              LostFocus="Information_textBox_LostFocus"/>
 
                     <Button x:Name="AddToCalc_button"
@@ -572,7 +571,7 @@
                 </Grid>
 
                 <!--Сетка с функционалом расчётки-->
-                <Grid x:Name="CulcGrid_Grid" Visibility="Hidden" Grid.Row="1" Margin="5,0,0,4">
+                <Grid x:Name="CulcGrid_Grid" Visibility="Visible" Grid.Row="1" Margin="5,0,0,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="64"/>
                         <RowDefinition Height="102.008"/>
@@ -648,6 +647,56 @@
                               SelectionChanged="allCountries_comboBox_SelectionChanged"
                               SelectedIndex="0" Grid.Column="1"/>
 
+                    <StackPanel Orientation="Vertical" Grid.Column="2" Grid.RowSpan="2" HorizontalAlignment="Left" Margin="620,51,0,0">
+                        <Button x:Name="addDependency_button"
+                                Template="{StaticResource btTemplate}" 
+                                Height="40" Width="40"
+                                Background="MediumSeaGreen" 
+                                VerticalAlignment="Top" 
+                                Margin="0,0,0,5" 
+                                ToolTip="Обновить ценники в расчетке"
+                                Click="addDependency_button_Click">
+
+                            <Image Source="pack://application:,,,/resources/images/add.png" Height="25" Width="25" Margin="-30,0,0,0"/>
+                        </Button>
+
+                        <Button x:Name="DeleteDependency"
+                                Template="{StaticResource btTemplate}"
+                                Height="40" Width="40"
+                                Background="OrangeRed" 
+                                ToolTip="Удалить фото" 
+                                Click="CalcDeleteImage_Click">
+
+                            <Image Source="/resources/images/delete_image.png" Height="27" Width="27" Margin="-30,0,0,0"/>
+                        </Button>
+                    </StackPanel>
+
+                    <DataGrid x:Name="DependencyDataGrid"
+                              Grid.Column="2" Margin="664,22,15,27" 
+                              FontFamily="Arial Black" Foreground="Gray" 
+                              RowHeaderWidth="0" Background="White" BorderThickness="1" Visibility="Visible" Grid.RowSpan="2" AutoGenerateColumns="False" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Наименование" Binding="{Binding ProductName}" Width="*"/>
+                            <DataGridComboBoxColumn Header="Тип" Width="*"
+                                        SelectedItemBinding="{Binding SelectedType}">
+                                <DataGridComboBoxColumn.ElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext.ComboBoxValues}"/>
+                                        <Setter Property="FontSize" Value="18"/>
+                                    </Style>
+                                </DataGridComboBoxColumn.ElementStyle>
+                                <DataGridComboBoxColumn.EditingElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext.ComboBoxValues}"/>
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                        <Setter Property="FontSize" Value="18"/>
+                                    </Style>
+                                </DataGridComboBoxColumn.EditingElementStyle>
+                            </DataGridComboBoxColumn>
+                            <DataGridTextColumn Header="Множитель" Binding="{Binding Multiplier}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
                 </Grid>
             </Grid>
         </Border>
@@ -661,7 +710,7 @@
 
             <Grid>
                 <!--Сетка с элементами управления основной БД-->
-                <Grid x:Name="DataBaseGrid_Grid" Margin="0,0,0,10" Visibility="Visible">
+                <Grid x:Name="DataBaseGrid_Grid" Margin="0,0,0,10" Visibility="Hidden">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="61"/>
                         <RowDefinition/>
@@ -731,7 +780,7 @@
                             <Image Source="/resources/images/save.png" Height="32" Width="32" Margin="-30,-2,0,0"/>
                         </Button>
                     </StackPanel>
-                    <DataGrid x:Name="dataBaseGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="White"
+                    <DataGrid x:Name="dataBaseGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="Transparent"
                               SelectionChanged="dataBaseGrid_SelectionChanged" RowHeight="30" MinRowHeight="30"
                               MouseDoubleClick="dataBaseGrid_MouseDoubleClick"
                               CanUserAddRows="False" FontFamily="Arial Black" Foreground="Gray"
@@ -754,7 +803,7 @@
                 </Grid>
 
                 <!--Сетка с элементами управления и dataGrid расчётки-->
-                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Hidden">
+                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Visible">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="953*"/>
                         <ColumnDefinition Width="957*"/>

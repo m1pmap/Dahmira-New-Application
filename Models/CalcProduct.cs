@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,5 +23,6 @@ namespace Dahmira.Models
         public int ID { get; set; } = 0; 
         public int ID_Art { get; set; } = 0;
         public string Note { get; set; } = string.Empty; //Примечания
+        public ObservableCollection<Dependency> dependencies { get; set; } = new ObservableCollection<Dependency>();
     }
 }

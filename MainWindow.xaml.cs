@@ -37,6 +37,9 @@ namespace Dahmira
         private ByteArrayToImageSourceConverter_Services converter = new ByteArrayToImageSourceConverter_Services(); //???Для Конвертации изображения в массив байтов и обратно???
         private IFileImporter fileImporter = new FileImporter_Services();
         public SettingsParameters settings = new SettingsParameters();
+        public bool isCalcSaved = true;
+        public ObservableCollection<Dependency> dependencies = new ObservableCollection<Dependency>();
+        public List<string> ComboBoxValues { get; set; } = new List<string> { "*", "+", "-", "/" };
 
         int oldCurrentProductIndex = 0; //Прошлый выбранный элемент в dataBaseGrid
 
@@ -72,6 +75,8 @@ namespace Dahmira
                     new TestData { Manufacturer = "Jomapeks", ProductName = "Металлический бункер с дном из нержавеющей стали. 120 кг и трансмиссия без микровыключателя", Article = "010 325", Unit = "шт.", Cost = 93.00 }
                 };
 
+                DependencyDataGrid.ItemsSource = dependencies;
+
                 dataBaseGrid.ItemsSource = items;
 
                 productsCount_label.Content = "из " + dataBaseGrid.Items.Count.ToString(); //Отображение количества товаров
@@ -99,7 +104,7 @@ namespace Dahmira
 
                 CalcDataGrid.ItemsSource = calcItems;
 
-                
+                DataContext = this;
             }
             catch (Exception e) { MessageBox.Show(e.Message); }
         }
@@ -400,7 +405,7 @@ namespace Dahmira
 
         private void dataBaseGrid_MouseDoubleClick(object sender, EventArgs e) //Добавление в расчётку при двойном нажатии на элемент 
         {
-            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, calcItems, fullCost);
+            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, this, fullCost);
             if (!isAddedWell)
             {
                 MessageBox.Show("Для начала добавьте раздел!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -419,6 +424,7 @@ namespace Dahmira
                     if (selectedItem.ProductName == null) //Если нажат раздел
                     {
                         CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative)); //Обнуление картинки, так как у раздела не может быть картинки
+                        DependencyDataGrid.ItemsSource = selectedItem.dependencies;
                     }
                     else
                     {
@@ -433,6 +439,7 @@ namespace Dahmira
                             var converter = new ByteArrayToImageSourceConverter_Services();
                             CalcProductImage.Source = (BitmapImage)converter.Convert(selectedItem.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
                         }
+                        DependencyDataGrid.ItemsSource = selectedItem.dependencies;
                     }
                 }
             }
@@ -484,6 +491,7 @@ namespace Dahmira
             }
 
             CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+            isCalcSaved = false;
         }
 
         private void CalcRefresh_button_Click(object sender, RoutedEventArgs e) //Обновление расчётки
@@ -585,7 +593,7 @@ namespace Dahmira
                 return;
             }
             int count = Convert.ToInt32(CountProductToAdd_textBox.Text); //Получение количества
-            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, calcItems, fullCost, count); //Добавление
+            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, this, fullCost, count); //Добавление
             if (!isAddedWell)
             {
                 MessageBox.Show("Для начала добавьте Раздел!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -601,7 +609,7 @@ namespace Dahmira
                 return;
             }
             int count = Convert.ToInt32(CountProductToAdd_textBox.Text); //Получение количества
-            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, calcItems, fullCost, count, "UnderSelect"); //Добавление
+            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, this, fullCost, count, "UnderSelect"); //Добавление
             if (!isAddedWell)
             {
                 MessageBox.Show("Для начала добавьте Раздел!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -617,7 +625,7 @@ namespace Dahmira
                 return;
             }
             int count = Convert.ToInt32(CountProductToAdd_textBox.Text); //Получение количества
-            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, calcItems, fullCost, count, "Replace"); //Замена
+            bool isAddedWell = CalcController.AddToCalc(dataBaseGrid, CalcDataGrid, this, fullCost, count, "Replace"); //Замена
             if (!isAddedWell)
             {
                 MessageBox.Show("Для начала добавьте Раздел!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -640,6 +648,7 @@ namespace Dahmira
 
             //Добавление
             calcItems.Insert(selectedIndex + 1, chapter);
+            isCalcSaved = false;
         }
 
         private void CalcToExcel_button_Click(object sender, RoutedEventArgs e)
@@ -661,12 +670,59 @@ namespace Dahmira
         private void saveCaalc_menuItem_Click(object sender, RoutedEventArgs e)
         {
             fileImporter.ExportCalcToFile(this);
+            isCalcSaved = true;
         }
 
         private void openCalc_menuItem_Click(object sender, RoutedEventArgs e)
         {
             fileImporter.ImportCalcFromFile(this);
             CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+            isCalcSaved = true;
+        }
+
+        private void newCalc_menuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if(isCalcSaved == false) 
+            {
+                MessageBoxResult res = MessageBox.Show("Не желаете сохранить эту расчётку?", "", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                if(res == MessageBoxResult.Yes) 
+                {
+                    fileImporter.ExportCalcToFile(this);
+                }
+                else
+                {
+                    calcItems.Clear();
+                }
+                calcItems.Clear();
+                isCalcSaved = true;
+            }
+            else
+            {
+                calcItems.Clear();
+            }
+        }
+
+        private void ShowHideDependencies_button_Click(object sender, RoutedEventArgs e)
+        {
+            for (int i = 0; i < CalcDataGrid.Items.Count; i++)
+            {
+                CalcProduct calcProduct = (CalcProduct)CalcDataGrid.Items[i];
+                if (calcProduct.ProductName == string.Empty)
+                {
+                    DataGridRow row = (DataGridRow)CalcDataGrid.ItemContainerGenerator.ContainerFromIndex(i);
+                    row.Background = Brushes.LightYellow;
+                }
+            }
+        }
+
+        private void addDependency_button_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+                selectedItem.dependencies.Add(new Dependency { ProductName = "", SelectedType = "*", Multiplier = 1 });
+            }
+            catch { }
         }
     }
 

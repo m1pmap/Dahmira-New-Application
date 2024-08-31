@@ -13,7 +13,7 @@ namespace Dahmira.Interfaces
     public interface ICalcController
     {
         void Refresh(DataGrid CalcGrid, ObservableCollection<CalcProduct> calcItems, Label fullCost_label); //Обновление расчётки
-        bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, ObservableCollection<CalcProduct> calcItems, Label fullCost_label, int count = 1, string position = "Last"); //Добавление в расчётку товара
+        bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, MainWindow window, Label fullCost_label, int count = 1, string position = "Last"); //Добавление в расчётку товара
         void ObjectFlashing(Button target, Color initialColor, Color flashingColor); //Анимация мигания выбранной кнопки и выбранными цветами
     }
 }

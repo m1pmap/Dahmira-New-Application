@@ -48,19 +48,31 @@ namespace Dahmira.Services
             fullCost_label.Content = fullCost;
             CalcGrid.Items.Refresh();
         }
-        public bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, ObservableCollection<CalcProduct> calcItems, Label fullCost_label, int count = 1, string position = "Last") //Добавление в расчётку товара
+        public bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, MainWindow window, Label fullCost_label, int count = 1, string position = "Last") //Добавление в расчётку товара
         {
             try
             {
-                if(calcItems.Count != 0)
+                if(window.calcItems.Count != 0)
                 {
                     TestData selectedDBItem = (TestData)DBGrid.SelectedItem; //Текущий выбранный элемент в БД
                     int selectedCalcItemIndex = CalcGrid.SelectedIndex; //Индекс текущего выбранного элемента в расчётке
 
+                    //Проверка на то добавлен ли уже этот товар в расчётку
+                    foreach(var item in window.calcItems)
+                    {
+                        if(item.Article == selectedDBItem.Article)
+                        {
+                            MessageBox.Show("Этот товар уже добавлен в расчётку, поэтому его количество увеличено на 1", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                            item.Count++;
+                            Refresh(CalcGrid, window.calcItems, fullCost_label);
+                            return true;
+                        }
+                    }
+
                     //Создание нового элемента расчётки
                     CalcProduct newCalcProductItem = new()
                     {
-                        Num = calcItems.Count + 1,
+                        Num = window.calcItems.Count + 1,
                         Manufacturer = selectedDBItem.Manufacturer,
                         ProductName = selectedDBItem.ProductName,
                         Article = selectedDBItem.Article,
@@ -77,22 +89,23 @@ namespace Dahmira.Services
                     {
                         case "Last": //В конец
                             {
-                                calcItems.Add(newCalcProductItem);
+                                window.calcItems.Add(newCalcProductItem);
                                 break;
                             }
                         case "UnderSelect": //Под выбранным
                             {
-                                calcItems.Insert(selectedCalcItemIndex + 1, newCalcProductItem);
+                                window.calcItems.Insert(selectedCalcItemIndex + 1, newCalcProductItem);
                                 break;
                             }
                         case "Replace": //Заменить
                             {
-                                calcItems[selectedCalcItemIndex] = newCalcProductItem;
+                                window.calcItems[selectedCalcItemIndex] = newCalcProductItem;
                                 break;
                             }
                     }
 
-                    Refresh(CalcGrid, calcItems, fullCost_label); //Обновление
+                    Refresh(CalcGrid, window.calcItems, fullCost_label); //Обновление
+                    window.isCalcSaved = false;
                     return true;
                 }
                 else
