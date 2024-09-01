@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Dahmira.Models
 {
@@ -18,11 +20,15 @@ namespace Dahmira.Models
         public byte[] Photo { get; set; } = null; //Фото
         public double RealCost { get; set; } = double.NaN; //Цена товара (реальная)
         public double Cost { get; set; } = double.NaN; //Цена товара (может изменяться в зависимости от страны)
-        public int Count { get; set; } = 0; //Количество
+        public double Count { get; set; } = double.NaN; //Количество
         public double TotalCost { get; set; } = double.NaN; //финальная цена
         public int ID { get; set; } = 0; 
         public int ID_Art { get; set; } = 0;
         public string Note { get; set; } = string.Empty; //Примечания
+        public string RowColor { get; set; } = "#FFFFFF";
+        public string RowForegroundColor { get; set; } = "#808080";
+
+        public bool isDependency { get; set; } = false;
         public ObservableCollection<Dependency> dependencies { get; set; } = new ObservableCollection<Dependency>();
     }
 }

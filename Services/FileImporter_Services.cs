@@ -366,7 +366,7 @@ namespace Dahmira.Services
             throw new NotImplementedException();
         }
 
-        void IFileImporter.ExportSettingsOnFile(MainWindow window) //Экспорт настроек в файл
+        void IFileImporter.ImportSettingsFromFile(MainWindow window) //Импорт настроек из файл
         {
             try
             {
@@ -383,7 +383,7 @@ namespace Dahmira.Services
             }
         }
 
-        void IFileImporter.ImportSettingsFromFile(MainWindow window) //Импорт настроек из файла
+        void IFileImporter.ExportSettingsOnFile(MainWindow window) //Экспорт настроек в файла
         {
             try
             {
@@ -401,9 +401,18 @@ namespace Dahmira.Services
         {
             try
             {
-                string localJsonString = File.ReadAllText("countries.json");
-                string ftpJsonString = string.Empty;
+                string localJsonString = string.Empty;
+                if (File.Exists("countries.json"))
+                {
+                    localJsonString = File.ReadAllText("countries.json");
+                }
+                else
+                {
+                    File.Create("countries.json");
+                }
 
+                string ftpJsonString = string.Empty;
+                
                 FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + ftpFilePath);
                 request.Method = WebRequestMethods.Ftp.DownloadFile;
                 request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
@@ -419,7 +428,13 @@ namespace Dahmira.Services
 
                 if (localJsonString != ftpJsonString)
                 {
+                    MessageBox.Show("Менеджер цен не совпадал, но был обновлён");
                     CountryManager.Instance.countries = JsonSerializer.Deserialize<ObservableCollection<Country>>(ftpJsonString);
+                    File.WriteAllText("countries.json", ftpJsonString);
+                }
+                else
+                {
+                    CountryManager.Instance.countries = JsonSerializer.Deserialize<ObservableCollection<Country>>(localJsonString);
                 }
             }
             catch(Exception ex ) 
@@ -433,6 +448,7 @@ namespace Dahmira.Services
             try
             {
                 string jsonString = JsonSerializer.Serialize(CountryManager.Instance.countries);
+                File.WriteAllText("countries.json", jsonString);
 
                 FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + ftpFilePath);
                 request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
@@ -444,6 +460,8 @@ namespace Dahmira.Services
                 {
                     requestStream.Write(fileBytes, 0, fileBytes.Length);
                 }
+
+                MessageBox.Show("Менеджер цен обновлён");
             }
             catch (Exception ex)
             {
@@ -455,7 +473,7 @@ namespace Dahmira.Services
         {
             var options = new JsonSerializerOptions
             {
-                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
             };
 
             string jsonString = JsonSerializer.Serialize(window.calcItems, options);
@@ -498,6 +516,9 @@ namespace Dahmira.Services
                 {
                     window.calcItems.Add(item);
                 }
+                window.ComboBoxAllProductNameValues.Clear();
+                window.ComboBoxAllProductNameValues = window.calcItems.Where(item => item.ProductName != string.Empty).Select(item => item.ProductName).ToList();
+                window.allCountries_comboBox.SelectedIndex = 0;
             }
         }
     }

@@ -293,5 +293,11 @@ namespace Dahmira.Pages
 
             mainWindow.settings = settings;
         }
+
+        private void SaveCountries_button_Click(object sender, RoutedEventArgs e)
+        {
+            IFileImporter fileImporter = new FileImporter_Services();
+            fileImporter.ExportCountriesToFTP();
+        }
     }
 }

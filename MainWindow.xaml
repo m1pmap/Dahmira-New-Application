@@ -11,7 +11,7 @@
     <Window.Resources>
         <ControlTemplate TargetType="Button" x:Key="btTemplate">
             <Border x:Name="border"
-                    CornerRadius="10" 
+                    CornerRadius="10"
                     Background="{TemplateBinding Background}">
                 <StackPanel Orientation="Horizontal" 
                             HorizontalAlignment="Center" 
@@ -29,6 +29,14 @@
                 </Trigger>
             </ControlTemplate.Triggers>
         </ControlTemplate>
+
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="Gray"/>
+            <!-- Цвет текста -->
+            <Setter Property="Background" Value="White"/>
+            <!-- Цвет фона -->
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
 
         <!--Стиль для dataGrid-->
         <Style TargetType="DataGrid">
@@ -54,7 +62,7 @@
                 <Setter.Value>
                     <Style TargetType="DataGridCell">
                         <Style.Triggers>
-                            <!-- Highlight selected rows -->
+                            <!--Highlight selected rows-->
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="Background" Value="MediumSeaGreen" />
                                 <Setter Property="BorderThickness" Value="0"/>
@@ -315,14 +323,13 @@
                         <ColumnDefinition Width="149"/>
                         <ColumnDefinition Width="108"/>
                         <ColumnDefinition Width="124"/>
-                        <ColumnDefinition Width="34*"/>
-                        <ColumnDefinition Width="83*"/>
+                        <ColumnDefinition Width="35*"/>
+                        <ColumnDefinition Width="87*"/>
                         <ColumnDefinition Width="164"/>
                         <ColumnDefinition Width="330"/>
-                        <ColumnDefinition Width="190*"/>
-                        <ColumnDefinition Width="181"/>
-                        <ColumnDefinition Width="164"/>
-                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="217*"/>
+                        <ColumnDefinition Width="161"/>
+                        <ColumnDefinition Width="172"/>
                     </Grid.ColumnDefinitions>
 
                     <Button x:Name="searchGrid_Button"
@@ -333,7 +340,7 @@
                             MinWidth="51" 
                             HorizontalAlignment="Center" 
                             VerticalAlignment="Top"
-                            Margin="0,5"
+                            Margin="0,5,0,0"
                             Grid.Row="0"
                             Grid.RowSpan="3"
     
@@ -361,7 +368,7 @@
 
                     <ComboBox x:Name ="Manufacturer_comboBox" 
                               DisplayMemberPath="name" Foreground="Gray" FontFamily="Arial Black"
-                              Grid.Row="1" VerticalAlignment="Center" Grid.Column="2" Width="Auto" Height="19" Grid.ColumnSpan="5" Margin="0,0,13,0">
+                              Grid.Row="1" VerticalAlignment="Center" Grid.Column="2" Width="Auto" Height="19" Grid.ColumnSpan="5" Margin="0,0,13,0" IsEditable="True">
                     </ComboBox>
 
                     <Label Content="НАИМЕНОВАНИЕ:" 
@@ -424,7 +431,7 @@
                             Background="Coral"
                             HorizontalAlignment="Left" 
                             VerticalAlignment="Top" 
-                            Margin="12,18,0,0"
+                            Margin="0,18,0,0"
                             ToolTip="Вставить из файла" Grid.Column="12" Grid.Row="1" Grid.RowSpan="3"
                             Click="uploadFromFile_button_Click">
 
@@ -439,7 +446,7 @@
                         Height="40" Width="40"
                         Background="OrangeRed" 
                         VerticalAlignment="Top"
-                        ToolTip="Удалить фото" HorizontalAlignment="Center" Grid.Column="12" Grid.Row="1" Margin="0,18,0,0" Grid.RowSpan="3"
+                        ToolTip="Удалить фото" HorizontalAlignment="Left" Grid.Column="12" Grid.Row="1" Margin="50,18,0,0" Grid.RowSpan="3"
                         Click="deletePhoto_button_Click">
 
                         <Image Source="/resources/images/delete_image.png" Height="27" Width="27" Margin="-30,0,0,0"/>
@@ -448,9 +455,9 @@
                     <Button x:Name="downloadToFile_button"
                         Template="{StaticResource btTemplate}" Width="40"
                         Background="Coral" 
-                        Margin="110,17,0,6"
-                        ToolTip="Сохранить в файл" HorizontalAlignment="Left" Grid.Column="12" Grid.RowSpan="3" Grid.Row="1"
-                        Click="downloadToFile_button_Click">
+                        Margin="0,18,33,0"
+                        ToolTip="Сохранить в файл" HorizontalAlignment="Right" Grid.Column="12" Grid.RowSpan="3" Grid.Row="1"
+                        Click="downloadToFile_button_Click" VerticalAlignment="Top" Height="40">
 
                         <Image Source="/resources/images/download_to_file.png" Height="27" Width="27" Margin="-30,0,0,0"/>
                     </Button>
@@ -460,7 +467,7 @@
                         Height="40" Width="40"
                         Background="#FF50CBFF" 
                         VerticalAlignment="Top" 
-                        Margin="87,1,0,0" Grid.Row="4"
+                        Margin="75,1,0,0" Grid.Row="4"
                         ToolTip="Сохранить в буфер" HorizontalAlignment="Left" Grid.Column="12" Grid.RowSpan="2"
                         Click="downloadToClipboard_button_Click">
 
@@ -472,7 +479,7 @@
                         Height="40" Width="40"
                         Background="#FF50CBFF" 
                         VerticalAlignment="Top" 
-                        Margin="37,1,0,0" Grid.Row="4"
+                        Margin="25,1,0,0" Grid.Row="4"
                         ToolTip="Вставить из буфера" HorizontalAlignment="Left" Grid.Column="12" Grid.RowSpan="2"
                         Click="uploadFromClipboard_Click">
 
@@ -480,7 +487,7 @@
                     </Button>
 
                     <Image x:Name="productImage"
-                        Margin="13,27,2,18" Source="/resources/images/without_picture.png" Grid.Column="11" Grid.RowSpan="6"/>
+                        Margin="10,22,10,9" Source="/resources/images/without_picture.png" Grid.Column="11" Grid.RowSpan="6" Height="98"/>
 
                     <Label Content="ИНФОРМАЦИЯ О ТОВАРЕ" 
                            HorizontalAlignment="Left" 
@@ -577,14 +584,16 @@
                         <RowDefinition Height="102.008"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="181"/>
-                        <ColumnDefinition Width="151"/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="953"/>
+                        <ColumnDefinition Width="609"/>
+                        <ColumnDefinition Width="161"/>
+                        <ColumnDefinition Width="160"/>
+                        <ColumnDefinition Width="22"/>
                     </Grid.ColumnDefinitions>
 
-                    <Image x:Name="CalcProductImage" Margin="15,17,15,10" Source="/resources/images/without_picture.png" Grid.RowSpan="2"/>
+                    <Image x:Name="CalcProductImage" Margin="16,39,4,29" Source="/resources/images/without_picture.png" Grid.RowSpan="2" Grid.Column="2" Height="98" Width="141"/>
 
-                    <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Top" Height="40" Margin="0,22,0,0" Grid.Row="0">
+                    <StackPanel Orientation="Horizontal" Grid.Column="3" VerticalAlignment="Top" Height="40" Margin="0,22,0,0" Grid.Row="0" Grid.ColumnSpan="2">
                         <Button x:Name="CalcUploadFromFile"
                                 Template="{StaticResource btTemplate}"
                                 Height="40" Width="40"
@@ -617,7 +626,7 @@
                         </Button>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1" VerticalAlignment="Top" Height="40" Margin="23,7,23,0">
+                    <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="1" VerticalAlignment="Top" Height="40" Margin="23,5,0,0" Grid.ColumnSpan="2">
                         <Button x:Name="CalcUploadFromClipboard"
                                 Template="{StaticResource btTemplate}"
                                 Height="40" Width="40"
@@ -640,14 +649,14 @@
                         </Button>
                     </StackPanel>
 
-                    <Label Content="НАСТРОЙКА ЦЕНЫ:" FontFamily="Arial Black" Foreground="Gray" Margin="3,48,2,19" Grid.Row="1" Grid.Column="1"/>
+                    <Label Content="НАСТРОЙКА ЦЕНЫ:" FontFamily="Arial Black" Foreground="Gray" Margin="3,45,10,22" Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2"/>
 
                     <ComboBox x:Name="allCountries_comboBox" 
-                              DisplayMemberPath="name" Foreground="Gray" FontFamily="Arial Black" Margin="0,70,0,10" Grid.Row="1"
+                              DisplayMemberPath="name" Foreground="Gray" FontFamily="Arial Black" Margin="0,68,8,12" Grid.Row="1"
                               SelectionChanged="allCountries_comboBox_SelectionChanged"
-                              SelectedIndex="0" Grid.Column="1"/>
+                              SelectedIndex="0" Grid.Column="3"/>
 
-                    <StackPanel Orientation="Vertical" Grid.Column="2" Grid.RowSpan="2" HorizontalAlignment="Left" Margin="620,51,0,0">
+                    <StackPanel Orientation="Vertical" Grid.RowSpan="2" HorizontalAlignment="Left" Margin="5,53,0,-2" Width="40">
                         <Button x:Name="addDependency_button"
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="40"
@@ -665,19 +674,33 @@
                                 Height="40" Width="40"
                                 Background="OrangeRed" 
                                 ToolTip="Удалить фото" 
-                                Click="CalcDeleteImage_Click">
+                                Click="DeleteDependency_Click">
 
                             <Image Source="/resources/images/delete_image.png" Height="27" Width="27" Margin="-30,0,0,0"/>
                         </Button>
                     </StackPanel>
 
-                    <DataGrid x:Name="DependencyDataGrid"
-                              Grid.Column="2" Margin="664,22,15,27" 
+                    <DataGrid x:Name="DependencyDataGrid" Margin="49,22,21,27" 
                               FontFamily="Arial Black" Foreground="Gray" 
                               RowHeaderWidth="0" Background="White" BorderThickness="1" Visibility="Visible" Grid.RowSpan="2" AutoGenerateColumns="False" CanUserAddRows="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Наименование" Binding="{Binding ProductName}" Width="*"/>
-                            <DataGridComboBoxColumn Header="Тип" Width="*"
+                            <DataGridComboBoxColumn Header="Наименование" Width="20*"
+                                SelectedItemBinding="{Binding SelectedProductName}">
+                                <DataGridComboBoxColumn.ElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext.ComboBoxProductNameValues}"/>
+                                    </Style>
+                                </DataGridComboBoxColumn.ElementStyle>
+                                <DataGridComboBoxColumn.EditingElementStyle>
+                                    <Style TargetType="ComboBox">
+                                        <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext.ComboBoxProductNameValues}"/>
+                                        <Setter Property="IsEditable" Value="True"/>
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </Style>
+                                </DataGridComboBoxColumn.EditingElementStyle>
+                            </DataGridComboBoxColumn>
+
+                            <DataGridComboBoxColumn Header="Тип" Width="2*"
                                         SelectedItemBinding="{Binding SelectedType}">
                                 <DataGridComboBoxColumn.ElementStyle>
                                     <Style TargetType="ComboBox">
@@ -693,7 +716,7 @@
                                     </Style>
                                 </DataGridComboBoxColumn.EditingElementStyle>
                             </DataGridComboBoxColumn>
-                            <DataGridTextColumn Header="Множитель" Binding="{Binding Multiplier}" Width="*"/>
+                            <DataGridTextColumn Header="Множитель" Binding="{Binding Multiplier}" Width="3*"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
@@ -710,7 +733,7 @@
 
             <Grid>
                 <!--Сетка с элементами управления основной БД-->
-                <Grid x:Name="DataBaseGrid_Grid" Margin="0,0,0,10" Visibility="Hidden">
+                <Grid x:Name="DataBaseGrid_Grid" Margin="0,0,0,10" Visibility="Visible">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="61"/>
                         <RowDefinition/>
@@ -803,7 +826,7 @@
                 </Grid>
 
                 <!--Сетка с элементами управления и dataGrid расчётки-->
-                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Visible">
+                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Hidden">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="953*"/>
                         <ColumnDefinition Width="957*"/>
@@ -892,7 +915,21 @@
                               SelectedCellsChanged="CalcdataGrid_SelectedCellsChanged"
                               CurrentCellChanged="CalcDataGrid_CurrentCellChanged" Grid.ColumnSpan="2">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="№" Binding="{Binding Num, Converter={StaticResource NullToEmptyStringConverter}}" Width="1*" MinWidth="30" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="№" Binding="{Binding Num, Converter={StaticResource NullToEmptyStringConverter}}" Width="1*" MinWidth="30" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding isDependency, Mode=OneWay}" Value="True">
+                                                <Setter   Property="Background" Value="LightPink"/>
+                                                <Setter Property="Margin" Value="-5"/>
+                                                <Setter Property="Padding" Value="6,6,0,0"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+
                             <DataGridTextColumn Header="Производитель" Binding="{Binding Manufacturer}" Width="10*" MinWidth="120" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Наименование"  Binding="{Binding ProductName}" Width="40*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Артикул"  Binding="{Binding Article}" Width="6*" MinWidth="70" IsReadOnly="True"></DataGridTextColumn>
@@ -911,6 +948,20 @@
                             <DataGridTextColumn Header="ID Art."  Binding="{Binding ID_Art, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
                             <DataGridTextColumn Header="Примечание"  Binding="{Binding Note}" Width="6*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
                         </DataGrid.Columns>
+
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="Background" Value="{Binding RowColor}"/>
+                                <Setter Property="Foreground" Value="{Binding RowForegroundColor}"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="LightSkyBlue"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+
                     </DataGrid>
                 </Grid>
             </Grid>

@@ -307,21 +307,37 @@
                         <Image x:Name="showHide_button_image" Source="pack://application:,,,/resources/images/arrow_left.png" Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Button>
 
-                    <DataGrid x:Name="WithoutCountryManufacturersDataGrid"
-                              Background="White" Foreground="Gray" Grid.Column="3" MinRowHeight="20"
-                              HorizontalScrollBarVisibility="Disabled"
-                              CanUserResizeRows="False"
-                              RowHeaderWidth="0"
-                              AutoGenerateColumns="False"
-                              IsReadOnly="True"
-                              MouseDoubleClick="WithoutCountryManufacturersDataGrid_MouseDoubleClick">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Без страны" Binding="{Binding name}" Width="*" MinWidth="150" IsReadOnly="False"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <StackPanel Grid.Column="3" Height="350" VerticalAlignment="Center">
+                        <DataGrid x:Name="WithoutCountryManufacturersDataGrid"
+                                  Background="White" Foreground="Gray" MinRowHeight="20"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  CanUserResizeRows="False"
+                                  RowHeaderWidth="0"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  MouseDoubleClick="WithoutCountryManufacturersDataGrid_MouseDoubleClick" Height="278">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Без страны" Binding="{Binding name}" Width="*" MinWidth="150" IsReadOnly="False"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <Button x:Name="SaveCountries_button"
+                                Template="{StaticResource btTemplate}" 
+                                Margin="0,10"
+                                Height="40"
+                                Background="MediumSeaGreen"  
+                                ToolTip="Сохранить менеджер цен"
+                                Content="СОХРАНИТЬ"
+                                Foreground="White"
+                                Click="SaveCountries_button_Click">
+                        </Button>
+
+
+                    </StackPanel>
+
                 </Grid>
             </TabItem>
-            
+
             <!--Вкладка с выводом данных в pdf и excel-->
             <TabItem Header="Вывод данных">
                 <Grid>
@@ -355,7 +371,7 @@
                                   Width="150" Margin="3" Foreground="Gray"
                                   DisplayMemberPath="Name"/>
                     </StackPanel>
-                    
+
                     <StackPanel Margin="10,0,10,0" Grid.Row="2" Orientation="Horizontal">
                         <Label Margin="0,0,6,0" Content="Цвет раздела:" Foreground="#a3a3a4" FontSize="14"/>
                         <ComboBox x:Name="ExcelChapterColors_comboBox" 

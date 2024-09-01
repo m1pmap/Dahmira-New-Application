@@ -8,7 +8,7 @@ namespace Dahmira.Models
 {
     public class Dependency
     {
-        public string ProductName { get; set; }
+        public string SelectedProductName { get; set; }
         public double Multiplier { get; set; }
         public string SelectedType { get; set; } // Это будет значение, выбранное в ComboBox
     }

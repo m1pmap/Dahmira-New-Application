@@ -1,4 +1,5 @@
-﻿using Dahmira.Interfaces;
+﻿using Dahmira.DAL.Model;
+using Dahmira.Interfaces;
 using Dahmira.Models;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,56 @@ namespace Dahmira.Services
             int chapterCount = 0;
             for (int i = 0; i < calcItems.Count; i++) //Перебор всех элементов
             {
+                double count = 0;
                 CalcProduct item = calcItems[i];
+                List<Dependency> forRemove = new List<Dependency>();
+
+                IEnumerable<Dependency> dataForRemove = item.dependencies.OfType<Dependency>()
+                                                                      .Where(item => item.SelectedProductName == string.Empty);
+
+                foreach (var removeItem in dataForRemove.Cast<Dependency>().ToArray())
+                {
+                    item.dependencies.Remove(removeItem);
+                }
+
+                if(item.dependencies.Count == 0) 
+                {
+                    item.isDependency = false;
+                    count = item.Count;
+                }
+                else
+                {
+                    foreach (var dep in item.dependencies)
+                    {
+                        CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dep.SelectedProductName);
+                        switch (dep.SelectedType)
+                        {
+                            case "*":
+                                {
+                                    count += foundProduct.Count * dep.Multiplier;
+                                    break;
+                                }
+                            case "+":
+                                {
+                                    count += foundProduct.Count + dep.Multiplier;
+                                    break;
+                                }
+                            case "-":
+                                {
+                                    count += foundProduct.Count - dep.Multiplier;
+                                    break;
+                                }
+                            case "/":
+                                {
+                                    count += foundProduct.Count / dep.Multiplier;
+                                    break;
+                                }
+                        }
+                    }
+                }
+
+                item.Count = Math.Round(count, 2);
+
                 item.TotalCost = Math.Round(item.Cost * item.Count, 2); //Обновление итоговой цены
                 if (item.Num != i + 1) //Если номер идёт не по порядку
                 {
@@ -45,7 +95,7 @@ namespace Dahmira.Services
                 }
             }
             CalcGrid.CommitEdit();
-            fullCost_label.Content = fullCost;
+            fullCost_label.Content = Math.Round(fullCost, 2);
             CalcGrid.Items.Refresh();
         }
         public bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, MainWindow window, Label fullCost_label, int count = 1, string position = "Last") //Добавление в расчётку товара
@@ -54,7 +104,7 @@ namespace Dahmira.Services
             {
                 if(window.calcItems.Count != 0)
                 {
-                    TestData selectedDBItem = (TestData)DBGrid.SelectedItem; //Текущий выбранный элемент в БД
+                    Material selectedDBItem = (Material)DBGrid.SelectedItem; //Текущий выбранный элемент в БД
                     int selectedCalcItemIndex = CalcGrid.SelectedIndex; //Индекс текущего выбранного элемента в расчётке
 
                     //Проверка на то добавлен ли уже этот товар в расчётку
@@ -78,10 +128,10 @@ namespace Dahmira.Services
                         Article = selectedDBItem.Article,
                         Unit = selectedDBItem.Unit,
                         Photo = selectedDBItem.Photo,
-                        RealCost = selectedDBItem.Cost,
-                        Cost = selectedDBItem.Cost,
+                        RealCost = Math.Round(selectedDBItem.Cost, 2),
+                        Cost = Math.Round(selectedDBItem.Cost, 2),
                         Count = count,
-                        TotalCost = selectedDBItem.Cost,
+                        TotalCost = Math.Round(selectedDBItem.Cost, 2),
                         Note = ""
                     };
 
@@ -106,6 +156,7 @@ namespace Dahmira.Services
 
                     Refresh(CalcGrid, window.calcItems, fullCost_label); //Обновление
                     window.isCalcSaved = false;
+                    window.ComboBoxAllProductNameValues.Add(newCalcProductItem.ProductName);
                     return true;
                 }
                 else
