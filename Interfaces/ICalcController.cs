@@ -15,5 +15,7 @@ namespace Dahmira.Interfaces
         void Refresh(DataGrid CalcGrid, ObservableCollection<CalcProduct> calcItems, Label fullCost_label); //Обновление расчётки
         bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, MainWindow window, Label fullCost_label, int count = 1, string position = "Last"); //Добавление в расчётку товара
         void ObjectFlashing(Button target, Color initialColor, Color flashingColor); //Анимация мигания выбранной кнопки и выбранными цветами
+        string ColorToHex(Color color); //Конвертация цвета в hex
+        void UpdateCellStyle(DataGrid dataGrid, Brush backgroundColor, Brush foregroundColor); //Изменение стиля для DataGrid
     }
 }

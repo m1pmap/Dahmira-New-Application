@@ -20,6 +20,8 @@ using System.Windows.Media;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Dahmira.DAL;
+using Microsoft.Win32;
 
 namespace Dahmira.Pages
 {
@@ -223,7 +225,34 @@ namespace Dahmira.Pages
 
         private void AddPriceFolderPath_button_Click(object sender, RoutedEventArgs e)  //Добавление пути к прайсу
         {
-            pathFolderController.SelectedFolderPathToTextBox(PriceFolderPath_textBox);
+            Stream myStream = null;
+            OpenFileDialog file = new OpenFileDialog();
+
+            file.Title = "Путь к локальной DB";
+            file.InitialDirectory = "C:\\";
+            file.Filter = "MDF File|*.mdf";
+            file.RestoreDirectory = true;
+
+            if (file.ShowDialog() == true)
+            {
+                try
+                {
+                    if ((myStream = file.OpenFile()) != null)
+                    {
+                        using (myStream) 
+                        {
+                            ConnectionString_Global.Value = file.FileName; 
+                            settings.PriceFolderPath = file.FileName;
+                            PriceFolderPath_textBox.Text = file.FileName;
+                        }
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка: Не удалось прочитать файл с диска. Original error: " + ex.Message);
+                }
+            }
         }
 
         private void DeletePriceFolderPath_button_Click(object sender, RoutedEventArgs e) //Удаление пути к прайсу

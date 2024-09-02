@@ -18,8 +18,12 @@ namespace Dahmira.Services
     {
         public void Refresh(DataGrid CalcGrid, ObservableCollection<CalcProduct> calcItems, Label fullCost_label) //Обновление расчётки
         {
+            ICalcController CalcController = new CalcController_Services();
             double fullCost = 0;
             int chapterCount = 0;
+            bool isNowAddToDependencies = false;
+            CalcProduct selectFordependency = null;
+
             for (int i = 0; i < calcItems.Count; i++) //Перебор всех элементов
             {
                 double count = 0;
@@ -27,7 +31,7 @@ namespace Dahmira.Services
                 List<Dependency> forRemove = new List<Dependency>();
 
                 IEnumerable<Dependency> dataForRemove = item.dependencies.OfType<Dependency>()
-                                                                      .Where(item => item.SelectedProductName == string.Empty);
+                                                                      .Where(item => item.ProductName == string.Empty);
 
                 foreach (var removeItem in dataForRemove.Cast<Dependency>().ToArray())
                 {
@@ -43,7 +47,7 @@ namespace Dahmira.Services
                 {
                     foreach (var dep in item.dependencies)
                     {
-                        CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dep.SelectedProductName);
+                        CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dep.ProductName);
                         switch (dep.SelectedType)
                         {
                             case "*":
@@ -93,7 +97,41 @@ namespace Dahmira.Services
                 {
                     fullCost += item.TotalCost;
                 }
+
+                if (item.ProductName == string.Empty)
+                {
+                    item.RowColor = CalcController.ColorToHex(Colors.LightYellow);
+                    item.RowForegroundColor = CalcController.ColorToHex(Colors.Gray);
+                }
+                if (item.RowColor == CalcController.ColorToHex(Colors.MediumSeaGreen))
+                {
+                    item.RowColor = CalcController.ColorToHex(Colors.MediumSeaGreen);
+                    item.RowForegroundColor = CalcController.ColorToHex(Colors.White);
+                    selectFordependency = item;
+                    isNowAddToDependencies = true;
+                }
+                else
+                {
+                    item.RowColor = CalcController.ColorToHex(Colors.Transparent);
+                    item.RowForegroundColor = CalcController.ColorToHex(Colors.Gray);
+                }
             }
+
+            var selectedItem = (CalcProduct)CalcGrid.SelectedItem;
+            if(selectedItem != null)
+            {
+                if(isNowAddToDependencies)
+                {
+                    selectedItem = selectFordependency;
+                }
+                foreach (var dependency in selectedItem.dependencies)
+                {
+                    CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dependency.ProductName);
+                    foundProduct.RowColor = CalcController.ColorToHex(Colors.LightGreen);
+                    foundProduct.RowForegroundColor = CalcController.ColorToHex(Colors.White);
+                }
+            }
+
             CalcGrid.CommitEdit();
             fullCost_label.Content = Math.Round(fullCost, 2);
             CalcGrid.Items.Refresh();
@@ -112,8 +150,8 @@ namespace Dahmira.Services
                     {
                         if(item.Article == selectedDBItem.Article)
                         {
-                            MessageBox.Show("Этот товар уже добавлен в расчётку, поэтому его количество увеличено на 1", "", MessageBoxButton.OK, MessageBoxImage.Information);
-                            item.Count++;
+                            MessageBox.Show("Этот товар уже добавлен в расчётку, поэтому его количество увеличено на " + count, "", MessageBoxButton.OK, MessageBoxImage.Information);
+                            item.Count += count;
                             Refresh(CalcGrid, window.calcItems, fullCost_label);
                             return true;
                         }
@@ -194,6 +232,36 @@ namespace Dahmira.Services
 
             // Запускаем анимацию
             storyboard.Begin();
+        }
+
+        public string ColorToHex(Color color)
+        {
+            return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+        void ICalcController.UpdateCellStyle(DataGrid dataGrid, Brush backgroundColor, Brush foregroundColor)
+        {
+            Style oldCellStyle = dataGrid.CellStyle;
+
+            // Создаем новый стиль, наследуя старый
+            Style newCellStyle = new Style(typeof(DataGridCell), oldCellStyle);
+
+            // Добавляем триггер для выделенных ячеек
+            Trigger selectedTrigger = new Trigger
+            {
+                Property = DataGridCell.IsSelectedProperty,
+                Value = true
+            };
+
+            // Устанавливаем фон и цвет текста для выделенной ячейки
+            selectedTrigger.Setters.Add(new Setter(DataGridCell.BackgroundProperty, backgroundColor));
+            selectedTrigger.Setters.Add(new Setter(DataGridCell.ForegroundProperty, foregroundColor));
+
+            // Добавляем триггер в новый стиль
+            newCellStyle.Triggers.Add(selectedTrigger);
+
+            // Применяем новый стиль к DataGrid
+            dataGrid.CellStyle = newCellStyle;
         }
     }
 }

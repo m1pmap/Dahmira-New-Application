@@ -59,6 +59,7 @@ namespace Dahmira
 
         private int lastSelectedItemIndex = 0;
         private bool isAddtoDependency = false;
+        private CalcProduct selectItemForDependencies;
 
         public MainWindow()
         {
@@ -68,6 +69,7 @@ namespace Dahmira
             fileImporter.ImportSettingsFromFile(this);
             fullCostType.Content = settings.FullCostType;
             fileImporter.ImportCountriesFromFTP();
+            ConnectionString_Global.Value = settings.PriceFolderPath;
 
             try
             {
@@ -380,6 +382,9 @@ namespace Dahmira
             SimpleSettings simpleSettings = new SimpleSettings(settings, this);
             simpleSettings.ShowDialog();
             fullCostType.Content = settings.FullCostType;
+            dbItems = repository.Get_AllMaterials();
+            dataBaseGrid.ItemsSource = dbItems;
+            productsCount_label.Content = "из " + dbItems.Count.ToString();
         }
 
         private void priceCalcButton_Click(object sender, RoutedEventArgs e) //Переход на прайс и расчётку
@@ -434,14 +439,13 @@ namespace Dahmira
                     if (selectedItem.ProductName == string.Empty) //Если нажат раздел
                     {
                         CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative)); //Обнуление картинки, так как у раздела не может быть картинки
-                        DependencyDataGrid.ItemsSource = selectedItem.dependencies;
-                        addDependency_button.IsEnabled = false;
-                        DeleteDependency.IsEnabled = false;
+                        startAddingDependency_button.IsEnabled = false;
+                        stopAddingDependency_button.IsEnabled = false;
                     }
                     else
                     {
-                        addDependency_button.IsEnabled = true;
-                        DeleteDependency.IsEnabled = true;
+                        startAddingDependency_button.IsEnabled = true;
+                        stopAddingDependency_button.IsEnabled = true;
 
                         var fileImageBytes = converter.ConvertFromFileImageToByteArray("without_image_database.png");
                         if (BitConverter.ToString(fileImageBytes) == BitConverter.ToString(selectedItem.Photo)) //Если нет фотографии
@@ -454,37 +458,16 @@ namespace Dahmira
                             var converter = new ByteArrayToImageSourceConverter_Services();
                             CalcProductImage.Source = (BitmapImage)converter.Convert(selectedItem.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
                         }
-                        DependencyDataGrid.ItemsSource = selectedItem.dependencies;
+                        
                         ComboBoxProductNameValues = new ObservableCollection<string>(ComboBoxAllProductNameValues);
                         ComboBoxProductNameValues.Remove(selectedItem.ProductName);
                     }
-                    foreach(var item in calcItems)
+
+                    if (!isAddtoDependency)
                     {
-                        if(item.ProductName == string.Empty)
-                        {
-                            item.RowColor = ColorToHex(Colors.LightYellow);
-                            item.RowForegroundColor = ColorToHex(Colors.Gray);
-                        }
-                        else
-                        {
-                            item.RowColor = ColorToHex(Colors.Transparent);
-                            item.RowForegroundColor = ColorToHex(Colors.Gray);
-                        }
+                        DependencyDataGrid.ItemsSource = selectedItem.dependencies;
                     }
-                    foreach (var dependency in selectedItem.dependencies)
-                    {
-                        if(dependency.SelectedProductName == string.Empty)
-                        {
-                            continue;
-                        }
-                        CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dependency.SelectedProductName);
-                        foundProduct.RowColor = ColorToHex(Colors.LightGreen);
-                        foundProduct.RowForegroundColor = ColorToHex(Colors.White);
-                    }
-                    if(!isAddtoDependency)
-                    {
-                        lastSelectedItemIndex = CalcDataGrid.SelectedIndex;
-                    }
+                    CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
                 }
             }
             catch { }
@@ -691,7 +674,7 @@ namespace Dahmira
                 Manufacturer = chapterName,
                 Cost = double.NaN,
                 TotalCost = double.NaN,
-                RowColor = ColorToHex(Colors.LightYellow)
+                RowColor = CalcController.ColorToHex(Colors.LightYellow)
             };
 
             //Добавление
@@ -723,10 +706,10 @@ namespace Dahmira
         private void openCalc_menuItem_Click(object sender, RoutedEventArgs e)
         {
             fileImporter.ImportCalcFromFile(this);
-            CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
             isCalcSaved = true;
             DependencyDataGrid.ItemsSource = dependencies;
             CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
+            CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
         }
 
         private void newCalc_menuItem_Click(object sender, RoutedEventArgs e)
@@ -745,33 +728,30 @@ namespace Dahmira
             CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
         }
 
-        private void addDependency_button_Click(object sender, RoutedEventArgs e)
+        private void startAddingDependency_button_Click(object sender, RoutedEventArgs e)
         {
             CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
             if(selectedItem != null) 
             {
-                selectedItem.isDependency = true;
-                selectedItem.dependencies.Add(new Dependency { SelectedProductName = "", SelectedType = "*", Multiplier = 1 });
-                isCalcSaved = false;
+                CalcController.UpdateCellStyle(CalcDataGrid, Brushes.LightGreen, Brushes.White);
+                CalcDataGrid.SelectedItem = null;
+                selectedItem.RowColor = CalcController.ColorToHex(Colors.MediumSeaGreen);
+                selectedItem.RowForegroundColor = CalcController.ColorToHex(Colors.White);
+                CalcDataGrid.Items.Refresh();
+                selectItemForDependencies = selectedItem;
+                isAddtoDependency = true;
+                DependencyDataGrid.ItemsSource = selectedItem.dependencies;
             }
         }
 
-        private void DeleteDependency_Click(object sender, RoutedEventArgs e)
+        private void stopAddingDependency_button_Click(object sender, RoutedEventArgs e)
         {
-            CalcProduct selectedCalcItem = (CalcProduct)CalcDataGrid.SelectedItem;
-            if(selectedCalcItem != null)
-            {
-                Dependency selectedDependencyItem = (Dependency)DependencyDataGrid.SelectedItem;
-                if(selectedDependencyItem != null) 
-                {
-                    selectedCalcItem.dependencies.Remove(selectedDependencyItem);
-                    if(selectedCalcItem.dependencies.Count == 0)
-                    {
-                        selectedCalcItem.isDependency = false;
-                    }
-                }
-                isCalcSaved = false;
-            }
+            isAddtoDependency = false;
+            CalcController.UpdateCellStyle(CalcDataGrid, Brushes.MediumSeaGreen, Brushes.White);
+            selectItemForDependencies.RowColor = CalcController.ColorToHex(Colors.Transparent);
+            selectItemForDependencies.RowForegroundColor = CalcController.ColorToHex(Colors.Gray);
+            CalcDataGrid.SelectedItem = selectItemForDependencies;
+            CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
         }
 
         private void Manufacturer_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -835,30 +815,46 @@ namespace Dahmira
             }
         }
 
-        private string ColorToHex(Color color) //Цвет в HEX
+        private void CalcDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
-        }
-
-        private void addToDependency_menuItem_Click(object sender, RoutedEventArgs e)
-        {
-            CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
-            if (selectedItem != null && lastSelectedItemIndex != 0) 
+            if(isAddtoDependency) 
             {
-                CalcProduct lastSelectItem = (CalcProduct)CalcDataGrid.Items[lastSelectedItemIndex];
-                if(lastSelectItem !=  selectedItem)
+                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+                if (selectedItem != null && selectItemForDependencies != selectedItem)
                 {
-                    lastSelectItem.dependencies.Add(new Dependency { SelectedProductName = selectedItem.ProductName, SelectedType = "*", Multiplier = 1 });
-                    CalcDataGrid.SelectedItem = lastSelectItem;
-                    isAddtoDependency = false;
+                    if (selectItemForDependencies.dependencies.Count == 0)
+                    {
+                        selectItemForDependencies.isDependency = true;
+                    }
+                    selectItemForDependencies.dependencies.Add(new Dependency { ProductName = selectedItem.ProductName, SelectedType = "*", Multiplier = 1 });
+                    CalcDataGrid.Items.Refresh();
+                    CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
                 }
             }
         }
 
-        private void CalcDataGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void deleteDependency_Click(object sender, RoutedEventArgs e)
         {
-            isAddtoDependency = true;
-            CalcDataGrid.SelectedItem = CalcDataGrid.Items[lastSelectedItemIndex];
+            CalcProduct selectedCalc = (CalcProduct)CalcDataGrid.SelectedItem;
+
+            if (isAddtoDependency)
+            {
+                selectedCalc = selectItemForDependencies;
+            }
+
+            if (selectedCalc != null) 
+            {
+                Dependency selectDependency = (Dependency)DependencyDataGrid.SelectedItem;
+                if(selectDependency != null) 
+                {
+                    selectedCalc.dependencies.Remove(selectDependency);
+                    if(selectedCalc.dependencies.Count == 0) 
+                    {
+                        selectedCalc.isDependency = false;
+                    }
+                    CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+                }
+            }
         }
     }
 }

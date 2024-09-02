@@ -1,4 +1,4 @@
-﻿<Window x:Class="Dahmira.MainWindow"
+﻿ <Window x:Class="Dahmira.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -306,7 +306,7 @@
                 </Grid>
 
                 <!--Сетка с функционалом поиска и добавления в расчётку-->
-                <Grid x:Name="searchGrid" Visibility="Hidden"   Grid.Row="1" Margin="5,0,0,0">
+                <Grid x:Name="searchGrid" Visibility="Visible"   Grid.Row="1" Margin="5,0,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="27.001"/>
                         <RowDefinition Height="21"/>
@@ -571,7 +571,7 @@
                 </Grid>
 
                 <!--Сетка с функционалом расчётки-->
-                <Grid x:Name="CulcGrid_Grid" Visibility="Visible" Grid.Row="1" Margin="5,0,0,4">
+                <Grid x:Name="CulcGrid_Grid" Visibility="Hidden" Grid.Row="1" Margin="5,0,0,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="64"/>
                         <RowDefinition Height="102.008"/>
@@ -650,24 +650,24 @@
                               SelectedIndex="0" Grid.Column="3"/>
 
                     <StackPanel Orientation="Vertical" Grid.RowSpan="2" HorizontalAlignment="Left" Margin="5,53,0,-2" Width="40">
-                        <Button x:Name="addDependency_button"
+                        <Button x:Name="startAddingDependency_button"
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="40"
                                 Background="MediumSeaGreen" 
                                 VerticalAlignment="Top" 
                                 Margin="0,0,0,5" 
                                 ToolTip="Обновить ценники в расчетке"
-                                Click="addDependency_button_Click">
+                                Click="startAddingDependency_button_Click">
 
                             <Image Source="pack://application:,,,/resources/images/add.png" Height="25" Width="25" Margin="-30,0,0,0"/>
                         </Button>
 
-                        <Button x:Name="DeleteDependency"
+                        <Button x:Name="stopAddingDependency_button"
                                 Template="{StaticResource btTemplate}"
                                 Height="40" Width="40"
                                 Background="OrangeRed" 
                                 ToolTip="Удалить фото" 
-                                Click="DeleteDependency_Click">
+                                Click="stopAddingDependency_button_Click">
 
                             <Image Source="/resources/images/delete_image.png" Height="27" Width="27" Margin="-30,0,0,0"/>
                         </Button>
@@ -677,21 +677,7 @@
                               FontFamily="Arial Black" Foreground="Gray" 
                               RowHeaderWidth="0" Background="White" BorderThickness="1" Visibility="Visible" Grid.RowSpan="2" AutoGenerateColumns="False" CanUserAddRows="False">
                         <DataGrid.Columns>
-                            <DataGridComboBoxColumn Header="Наименование" Width="20*"
-                                SelectedItemBinding="{Binding SelectedProductName}">
-                                <DataGridComboBoxColumn.ElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext.ComboBoxProductNameValues}"/>
-                                    </Style>
-                                </DataGridComboBoxColumn.ElementStyle>
-                                <DataGridComboBoxColumn.EditingElementStyle>
-                                    <Style TargetType="ComboBox">
-                                        <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}, Path=DataContext.ComboBoxProductNameValues}"/>
-                                        <Setter Property="IsEditable" Value="True"/>
-                                        <Setter Property="Foreground" Value="Gray"/>
-                                    </Style>
-                                </DataGridComboBoxColumn.EditingElementStyle>
-                            </DataGridComboBoxColumn>
+                            <DataGridTextColumn Header="Наименование" Binding="{Binding ProductName}" Width="20*"/> 
 
                             <DataGridComboBoxColumn Header="Тип" Width="2*"
                                         SelectedItemBinding="{Binding SelectedType}">
@@ -711,6 +697,13 @@
                             </DataGridComboBoxColumn>
                             <DataGridTextColumn Header="Множитель" Binding="{Binding Multiplier}" Width="3*"/>
                         </DataGrid.Columns>
+
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem x:Name="deleteDependency" Header="Удалить зависимость" Click="deleteDependency_Click"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                        
                     </DataGrid>
 
                 </Grid>
@@ -907,7 +900,7 @@
                               CanUserAddRows="False" HorizontalScrollBarVisibility="Disabled" RowHeaderWidth="0"
                               SelectedCellsChanged="CalcdataGrid_SelectedCellsChanged"
                               CurrentCellChanged="CalcDataGrid_CurrentCellChanged" Grid.ColumnSpan="2"
-                              MouseRightButtonDown="CalcDataGrid_MouseRightButtonDown">
+                              MouseDoubleClick="CalcDataGrid_MouseDoubleClick">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="№" Binding="{Binding Num, Converter={StaticResource NullToEmptyStringConverter}}" Width="1*" MinWidth="30" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
@@ -955,13 +948,6 @@
                                 </Style.Triggers>
                             </Style>
                         </DataGrid.RowStyle>
-
-                        <DataGrid.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem x:Name="addToDependency_menuItem" Header="Добавить в зависимость" Click="addToDependency_menuItem_Click"/>
-                            </ContextMenu>
-                        </DataGrid.ContextMenu>
-
                     </DataGrid>
                 </Grid>
             </Grid>
