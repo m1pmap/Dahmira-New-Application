@@ -92,10 +92,10 @@ namespace Dahmira
                 Manufacturer_comboBox.ItemsSource = CountryManager.Instance.allManufacturers;
                 ProductName_comboBox.ItemsSource = dbItems;
                 Article_comboBox.ItemsSource = dbItems;
-                Unit_comboBox.ItemsSource = dbItems;
                 Cost_comboBox.ItemsSource = dbItems;
 
                 allCountries_comboBox.ItemsSource = CountryManager.Instance.countries;
+                isCalcSaved = true;
                 
                 CalcDataGrid.ItemsSource = calcItems;
                 DataContext = this;
@@ -552,10 +552,11 @@ namespace Dahmira
 
                     if (imageIsEdit) //Если картинку загрузили
                     {
-                        //Изменение картинки в dataBaseGrid
+                        //Изменение картинки в calcDataGrid
                         int index = CalcDataGrid.SelectedIndex;
                         calcItems[index].Photo = converter.ConvertFromComponentImageToByteArray(CalcProductImage);
                         CalcDataGrid.Items.Refresh();
+                        isCalcSaved = false;
                     }
                 }
             }
@@ -580,6 +581,7 @@ namespace Dahmira
                     int index = CalcDataGrid.SelectedIndex;
                     calcItems[index].Photo = converter.ConvertFromFileImageToByteArray("without_image_database.png");
                     CalcDataGrid.Items.Refresh();
+                    isCalcSaved = false;
                 }
             }
             catch { }
@@ -611,6 +613,7 @@ namespace Dahmira
                         int index = CalcDataGrid.SelectedIndex;
                         calcItems[index].Photo = converter.ConvertFromComponentImageToByteArray(CalcProductImage);
                         CalcDataGrid.Items.Refresh();
+                        isCalcSaved = false;
                     }
                 }
             }
@@ -715,6 +718,8 @@ namespace Dahmira
             fileImporter.ImportCalcFromFile(this);
             CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
             isCalcSaved = true;
+            DependencyDataGrid.ItemsSource = dependencies;
+            CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
         }
 
         private void newCalc_menuItem_Click(object sender, RoutedEventArgs e)
@@ -726,28 +731,22 @@ namespace Dahmira
                 {
                     fileImporter.ExportCalcToFile(this);
                 }
-                else
-                {
-                    calcItems.Clear();
-                }
-                calcItems.Clear();
                 isCalcSaved = true;
             }
-            else
-            {
-                calcItems.Clear();
-            }
+            calcItems.Clear();
+            DependencyDataGrid.ItemsSource = dependencies;
+            CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
         }
 
         private void addDependency_button_Click(object sender, RoutedEventArgs e)
         {
-            try
+            CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+            if(selectedItem != null) 
             {
-                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
                 selectedItem.isDependency = true;
                 selectedItem.dependencies.Add(new Dependency { SelectedProductName = "", SelectedType = "*", Multiplier = 1 });
+                isCalcSaved = false;
             }
-            catch { }
         }
 
         private void DeleteDependency_Click(object sender, RoutedEventArgs e)
@@ -764,6 +763,68 @@ namespace Dahmira
                         selectedCalcItem.isDependency = false;
                     }
                 }
+                isCalcSaved = false;
+            }
+        }
+
+        private void Manufacturer_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Manufacturer manufacturerItem = (Manufacturer)Manufacturer_comboBox.SelectedItem;
+            if(manufacturerItem != null) 
+            {
+                var selectedItems = dbItems.Where(item => item.Manufacturer == manufacturerItem.name).ToList();
+
+                ProductName_comboBox.SelectedItem = selectedItems[0];
+                Article_comboBox.SelectedItem = selectedItems[0];
+                Cost_comboBox.SelectedItem = selectedItems[0];
+
+                ProductName_comboBox.ItemsSource = selectedItems;
+                Article_comboBox.ItemsSource = selectedItems;
+                Cost_comboBox.ItemsSource = selectedItems;
+
+                dataBaseGrid.SelectedItem = selectedItems[0];
+            }
+        }
+
+        private void ProductName_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Material selectedItem = (Material)ProductName_comboBox.SelectedItem;
+            if(selectedItem != null) 
+            {
+                var selectManufacturer = CountryManager.Instance.allManufacturers.First(item => item.name == selectedItem.Manufacturer);
+                Manufacturer_comboBox.SelectedItem = selectManufacturer;
+                Article_comboBox.SelectedItem = selectedItem;
+                Cost_comboBox.SelectedItem= selectedItem;
+
+                dataBaseGrid.SelectedItem = selectedItem;
+            }
+        }
+
+        private void Article_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Material selectedItem = (Material)Article_comboBox.SelectedItem;
+            if (selectedItem != null)
+            {
+                var selectManufacturer = CountryManager.Instance.allManufacturers.First(item => item.name == selectedItem.Manufacturer);
+                Manufacturer_comboBox.SelectedItem = selectManufacturer;
+                ProductName_comboBox.SelectedItem = selectedItem;
+                Cost_comboBox.SelectedItem = selectedItem;
+
+                dataBaseGrid.SelectedItem = selectedItem;
+            }
+        }
+
+        private void Cost_comboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Material selectedItem = (Material)Cost_comboBox.SelectedItem;
+            if (selectedItem != null)
+            {
+                var selectManufacturer = CountryManager.Instance.allManufacturers.First(item => item.name == selectedItem.Manufacturer);
+                Manufacturer_comboBox.SelectedItem = selectManufacturer;
+                ProductName_comboBox.SelectedItem = selectedItem;
+                Article_comboBox.SelectedItem = selectedItem;
+
+                dataBaseGrid.SelectedItem = selectedItem;
             }
         }
 

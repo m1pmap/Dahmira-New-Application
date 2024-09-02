@@ -306,7 +306,7 @@
                 </Grid>
 
                 <!--Сетка с функционалом поиска и добавления в расчётку-->
-                <Grid x:Name="searchGrid" Visibility="Hidden" Grid.Row="1" Margin="5,0,0,0">
+                <Grid x:Name="searchGrid" Visibility="Visible"   Grid.Row="1" Margin="5,0,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="27.001"/>
                         <RowDefinition Height="21"/>
@@ -368,7 +368,8 @@
 
                     <ComboBox x:Name ="Manufacturer_comboBox" 
                               DisplayMemberPath="name" Foreground="Gray" FontFamily="Arial Black"
-                              Grid.Row="1" VerticalAlignment="Center" Grid.Column="2" Width="Auto" Height="19" Grid.ColumnSpan="5" Margin="0,0,13,0" IsEditable="True">
+                              Grid.Row="1" VerticalAlignment="Center" Grid.Column="2" Width="Auto" Height="19" Grid.ColumnSpan="5" Margin="0,0,13,0" IsEditable="True"
+                              SelectionChanged="Manufacturer_comboBox_SelectionChanged">
                     </ComboBox>
 
                     <Label Content="НАИМЕНОВАНИЕ:" 
@@ -380,7 +381,8 @@
 
                     <ComboBox x:Name ="ProductName_comboBox" 
                               DisplayMemberPath="ProductName" Foreground="Gray" FontFamily="Arial Black"
-                              Grid.Row="2" VerticalAlignment="Center" Grid.Column="2" Width="Auto" Height="19" Grid.ColumnSpan="5" Margin="0,0,13,0"/>
+                              Grid.Row="2" VerticalAlignment="Center" Grid.Column="2" Width="Auto" Height="19" Grid.ColumnSpan="5" Margin="0,0,13,0" IsEditable="True"
+                              SelectionChanged="ProductName_comboBox_SelectionChanged"/>
 
                     <Label Content="АРТИКУЛ:" 
                         HorizontalAlignment="Center" 
@@ -391,18 +393,8 @@
 
                     <ComboBox x:Name="Article_comboBox" 
                               DisplayMemberPath="Article" Foreground="Gray" FontFamily="Arial Black"
-                              Grid.Row="3" VerticalAlignment="Center" Grid.Column="2" Height="19"/>
-
-                    <Label Content="ЕД. ИЗМЕРЕНИЯ:" 
-                        HorizontalAlignment="Center" 
-                        FontFamily="Arial Black" 
-                        VerticalAlignment="Center" 
-                        Height="24" Width="156" 
-                        Foreground="Gray" FontSize="14" Grid.Row="3" HorizontalContentAlignment="Right" Grid.Column="3"/>
-
-                    <ComboBox x:Name="Unit_comboBox" 
-                              DisplayMemberPath="Unit" Foreground="Gray" FontFamily="Arial Black"
-                              Grid.Row="3" VerticalAlignment="Center" Grid.Column="4" Height="19" Grid.ColumnSpan="3" Margin="0,0,13,0"/>
+                              Grid.Row="3" VerticalAlignment="Center" Grid.Column="2" Height="19" IsEditable="True" Grid.ColumnSpan="5" Margin="0,0,13,0"
+                              SelectionChanged="Article_comboBox_SelectionChanged"/>
 
                     <Label Content="ЦЕНА:" 
                         HorizontalAlignment="Center" 
@@ -413,14 +405,15 @@
 
                     <ComboBox x:Name="Cost_comboBox" 
                               DisplayMemberPath="Cost" Foreground="Gray" FontFamily="Arial Black"
-                              Grid.Row="4" VerticalAlignment="Center" Grid.Column="2" Height="19" Grid.ColumnSpan="2" Margin="0,0,127,0"/>
+                              Grid.Row="4" VerticalAlignment="Center" Grid.Column="2" Height="19" Grid.ColumnSpan="2" Margin="0,0,127,0" IsEditable="True"
+                              SelectionChanged="Cost_comboBox_SelectionChanged"/>
 
                     <Label Content="КОЛИЧЕСТВО:" 
-                        HorizontalAlignment="Center" 
+                        HorizontalAlignment="Left" 
                         FontFamily="Arial Black" 
                         VerticalAlignment="Center" 
-                        Height="24" Width="150" 
-                        Foreground="Gray" FontSize="14" Grid.Row="4" HorizontalContentAlignment="Right" Grid.Column="3"/>
+                        Height="24" Width="127" 
+                        Foreground="Gray" FontSize="14" Grid.Row="4" HorizontalContentAlignment="Right" Grid.Column="3" Margin="22,0,0,0"/>
 
                     <TextBox x:Name="CountProductToAdd_textBox" Text="1"
                              Grid.Row="4" Grid.Column="4" Margin="0,1,13,1" FontSize="14" Foreground="Gray" FontFamily="Arial Black" Grid.ColumnSpan="3"/>
@@ -578,7 +571,7 @@
                 </Grid>
 
                 <!--Сетка с функционалом расчётки-->
-                <Grid x:Name="CulcGrid_Grid" Visibility="Visible" Grid.Row="1" Margin="5,0,0,4">
+                <Grid x:Name="CulcGrid_Grid" Visibility="Hidden" Grid.Row="1" Margin="5,0,0,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="64"/>
                         <RowDefinition Height="102.008"/>
