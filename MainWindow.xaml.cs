@@ -57,6 +57,9 @@ namespace Dahmira
         private ObservableCollection<Material> dbItems; //Элементы в БД
         public ObservableCollection<CalcProduct> calcItems = new ObservableCollection<CalcProduct>(); //Элементы в расчётке
 
+        private int lastSelectedItemIndex = 0;
+        private bool isAddtoDependency = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -478,6 +481,10 @@ namespace Dahmira
                         foundProduct.RowColor = ColorToHex(Colors.LightGreen);
                         foundProduct.RowForegroundColor = ColorToHex(Colors.White);
                     }
+                    if(!isAddtoDependency)
+                    {
+                        lastSelectedItemIndex = CalcDataGrid.SelectedIndex;
+                    }
                 }
             }
             catch { }
@@ -831,6 +838,27 @@ namespace Dahmira
         private string ColorToHex(Color color) //Цвет в HEX
         {
             return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+        private void addToDependency_menuItem_Click(object sender, RoutedEventArgs e)
+        {
+            CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+            if (selectedItem != null && lastSelectedItemIndex != 0) 
+            {
+                CalcProduct lastSelectItem = (CalcProduct)CalcDataGrid.Items[lastSelectedItemIndex];
+                if(lastSelectItem !=  selectedItem)
+                {
+                    lastSelectItem.dependencies.Add(new Dependency { SelectedProductName = selectedItem.ProductName, SelectedType = "*", Multiplier = 1 });
+                    CalcDataGrid.SelectedItem = lastSelectItem;
+                    isAddtoDependency = false;
+                }
+            }
+        }
+
+        private void CalcDataGrid_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            isAddtoDependency = true;
+            CalcDataGrid.SelectedItem = CalcDataGrid.Items[lastSelectedItemIndex];
         }
     }
 }

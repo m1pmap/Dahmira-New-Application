@@ -306,7 +306,7 @@
                 </Grid>
 
                 <!--Сетка с функционалом поиска и добавления в расчётку-->
-                <Grid x:Name="searchGrid" Visibility="Visible"   Grid.Row="1" Margin="5,0,0,0">
+                <Grid x:Name="searchGrid" Visibility="Hidden"   Grid.Row="1" Margin="5,0,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="27.001"/>
                         <RowDefinition Height="21"/>
@@ -571,7 +571,7 @@
                 </Grid>
 
                 <!--Сетка с функционалом расчётки-->
-                <Grid x:Name="CulcGrid_Grid" Visibility="Hidden" Grid.Row="1" Margin="5,0,0,4">
+                <Grid x:Name="CulcGrid_Grid" Visibility="Visible" Grid.Row="1" Margin="5,0,0,4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="64"/>
                         <RowDefinition Height="102.008"/>
@@ -906,7 +906,8 @@
                               RowHeight="30" MinRowHeight="30"
                               CanUserAddRows="False" HorizontalScrollBarVisibility="Disabled" RowHeaderWidth="0"
                               SelectedCellsChanged="CalcdataGrid_SelectedCellsChanged"
-                              CurrentCellChanged="CalcDataGrid_CurrentCellChanged" Grid.ColumnSpan="2">
+                              CurrentCellChanged="CalcDataGrid_CurrentCellChanged" Grid.ColumnSpan="2"
+                              MouseRightButtonDown="CalcDataGrid_MouseRightButtonDown">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="№" Binding="{Binding Num, Converter={StaticResource NullToEmptyStringConverter}}" Width="1*" MinWidth="30" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
@@ -954,6 +955,12 @@
                                 </Style.Triggers>
                             </Style>
                         </DataGrid.RowStyle>
+
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem x:Name="addToDependency_menuItem" Header="Добавить в зависимость" Click="addToDependency_menuItem_Click"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
 
                     </DataGrid>
                 </Grid>
