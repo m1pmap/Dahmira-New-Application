@@ -225,34 +225,7 @@ namespace Dahmira.Pages
 
         private void AddPriceFolderPath_button_Click(object sender, RoutedEventArgs e)  //Добавление пути к прайсу
         {
-            Stream myStream = null;
-            OpenFileDialog file = new OpenFileDialog();
-
-            file.Title = "Путь к локальной DB";
-            file.InitialDirectory = "C:\\";
-            file.Filter = "MDF File|*.mdf";
-            file.RestoreDirectory = true;
-
-            if (file.ShowDialog() == true)
-            {
-                try
-                {
-                    if ((myStream = file.OpenFile()) != null)
-                    {
-                        using (myStream) 
-                        {
-                            ConnectionString_Global.Value = file.FileName; 
-                            settings.PriceFolderPath = file.FileName;
-                            PriceFolderPath_textBox.Text = file.FileName;
-                        }
-
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Ошибка: Не удалось прочитать файл с диска. Original error: " + ex.Message);
-                }
-            }
+            pathFolderController.SelectedFolderPathToTextBox(PriceFolderPath_textBox);
         }
 
         private void DeletePriceFolderPath_button_Click(object sender, RoutedEventArgs e) //Удаление пути к прайсу

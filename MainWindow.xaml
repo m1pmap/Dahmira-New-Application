@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dahmira"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920" WindowStyle="ThreeDBorderWindow" Closed="Window_Closed">
+        Title="MainWindow" Height="1080" Width="1920" WindowStyle="ThreeDBorderWindow" Closed="Window_Closed" Icon="/resources/images/ico.ico">
 
     <!--Стиль для кнопок с закруглёнными краями-->
     <Window.Resources>
@@ -121,6 +121,9 @@
                     <MenuItem x:Name="newCalc_menuItem" Header="Новый расчёт" Click="newCalc_menuItem_Click"></MenuItem>
                     <MenuItem x:Name="openCalc_menuItem" Header="Загрузить расчёт" Click="openCalc_menuItem_Click"></MenuItem>
                     <MenuItem x:Name="saveCaalc_menuItem" Header="Сохранить расчёт" Click="saveCaalc_menuItem_Click" ></MenuItem>
+                    <Separator/>
+                    <MenuItem x:Name="uploadDataBase_menuItem" Header="Загрузить базу данных с другого источника" Click="uploadDataBase_menuItem_Click"></MenuItem>
+                    <MenuItem x:Name="downloadDataBaseFromFtp_menuItem" Header="Загрузить базу данных с сервера" Click="downloadDataBaseFromFtp_menuItem_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="ДАННЫЕ" Foreground="#FF585454" FontFamily="Arial Black" ></MenuItem>
                 <MenuItem Header="НАСТРОЙКИ" Foreground="#FF585454" FontFamily="Arial Black" >
@@ -650,24 +653,24 @@
                               SelectedIndex="0" Grid.Column="3"/>
 
                     <StackPanel Orientation="Vertical" Grid.RowSpan="2" HorizontalAlignment="Left" Margin="5,53,0,-2" Width="40">
-                        <Button x:Name="startAddingDependency_button"
+                        <Button x:Name="startStopAddingDependency_button"
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="40"
                                 Background="MediumSeaGreen" 
                                 VerticalAlignment="Top" 
                                 Margin="0,0,0,5" 
-                                ToolTip="Обновить ценники в расчетке"
-                                Click="startAddingDependency_button_Click">
+                                ToolTip="Начать добавление зависимостей"
+                                Click="startStopAddingDependency_button_Click">
 
-                            <Image Source="pack://application:,,,/resources/images/add.png" Height="25" Width="25" Margin="-30,0,0,0"/>
+                            <Image x:Name="startStopAddingDependency_image" Source="pack://application:,,,/resources/images/play.png" Height="35" Width="35" Margin="-30,0,0,0"/>
                         </Button>
 
-                        <Button x:Name="stopAddingDependency_button"
+                        <Button x:Name="deleteDependency_button"
                                 Template="{StaticResource btTemplate}"
                                 Height="40" Width="40"
-                                Background="OrangeRed" 
-                                ToolTip="Удалить фото" 
-                                Click="stopAddingDependency_button_Click">
+                                Background="OrangeRed"  
+                                ToolTip="Удалить зависимость" 
+                                Click="deleteDependency_button_Click">
 
                             <Image Source="/resources/images/delete_image.png" Height="27" Width="27" Margin="-30,0,0,0"/>
                         </Button>
@@ -677,7 +680,7 @@
                               FontFamily="Arial Black" Foreground="Gray" 
                               RowHeaderWidth="0" Background="White" BorderThickness="1" Visibility="Visible" Grid.RowSpan="2" AutoGenerateColumns="False" CanUserAddRows="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Наименование" Binding="{Binding ProductName}" Width="20*"/> 
+                            <DataGridTextColumn Header="Наименование" Binding="{Binding ProductName}" Width="20*" IsReadOnly="True"/>
 
                             <DataGridComboBoxColumn Header="Тип" Width="2*"
                                         SelectedItemBinding="{Binding SelectedType}">
@@ -697,15 +700,7 @@
                             </DataGridComboBoxColumn>
                             <DataGridTextColumn Header="Множитель" Binding="{Binding Multiplier}" Width="3*"/>
                         </DataGrid.Columns>
-
-                        <DataGrid.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem x:Name="deleteDependency" Header="Удалить зависимость" Click="deleteDependency_Click"/>
-                            </ContextMenu>
-                        </DataGrid.ContextMenu>
-                        
                     </DataGrid>
-
                 </Grid>
             </Grid>
         </Border>

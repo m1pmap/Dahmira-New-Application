@@ -27,7 +27,6 @@ namespace Dahmira.Services
         private string url_praise = "ftp://31.177.95.187";
         private string ftpUsername = "dahmira1_admin";
         private string ftpPassword = "zI2Hghfnslob";
-        private string ftpFilePath = "/countries/countriesTest.json";
         void IFileImporter.ExportToExcel(MainWindow window) //Экспорт расчётки в Excel
         {
             try
@@ -401,6 +400,7 @@ namespace Dahmira.Services
         {
             try
             {
+                string ftpFilePath = "/countries/countriesTest.json";
                 string localJsonString = string.Empty;
                 if (File.Exists("countries.json"))
                 {
@@ -447,6 +447,7 @@ namespace Dahmira.Services
         {
             try
             {
+                string ftpFilePath = "/countries/countriesTest.json";
                 string jsonString = JsonSerializer.Serialize(CountryManager.Instance.countries);
                 File.WriteAllText("countries.json", jsonString);
 
@@ -516,9 +517,54 @@ namespace Dahmira.Services
                 {
                     window.calcItems.Add(item);
                 }
-                window.ComboBoxAllProductNameValues.Clear();
-                window.ComboBoxAllProductNameValues = window.calcItems.Where(item => item.ProductName != string.Empty).Select(item => item.ProductName).ToList();
                 window.allCountries_comboBox.SelectedIndex = 0;
+            }
+        }
+
+        void IFileImporter.ImportDBFromFTP(MainWindow window)
+        {
+            string ftpFilePath = "/data_price_test/Dahmira_TestDb.mdf";
+            string ftpFilePathLdf = "/data_price_test/Dahmira_TestDb_log.ldf";
+            string localFilePath = window.settings.PriceFolderPath + "/Dahmira_TestDb.mdf";
+            string localFilePathLdf = window.settings.PriceFolderPath + "/Dahmira_TestDb_log.ldf";
+            try
+            {
+                // Создаем запрос для скачивания файла
+                FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + ftpFilePath);
+                request.Method = WebRequestMethods.Ftp.DownloadFile;
+                request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+                request.UseBinary = true;
+
+                // Получаем ответ от сервера
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (Stream responseStream = response.GetResponseStream())
+                using (FileStream fileStream = new FileStream(localFilePath, FileMode.Create))
+                {
+                    // Копируем поток данных из ответа в локальный файл
+                    responseStream.CopyTo(fileStream);
+                }
+
+                // Создаем запрос для скачивания файла
+                FtpWebRequest requestLdf = (FtpWebRequest)WebRequest.Create(url_praise + ftpFilePathLdf);
+                requestLdf.Method = WebRequestMethods.Ftp.DownloadFile;
+                requestLdf.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+                requestLdf.UseBinary = true;
+
+                // Получаем ответ от сервера
+                using (FtpWebResponse response = (FtpWebResponse)requestLdf.GetResponse())
+                using (Stream responseStream = response.GetResponseStream())
+                using (FileStream fileStream = new FileStream(localFilePathLdf, FileMode.Create))
+                {
+                    // Копируем поток данных из ответа в локальный файл
+                    responseStream.CopyTo(fileStream);
+                }
+
+                MessageBox.Show("Файл успешно загружен");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
             }
         }
     }

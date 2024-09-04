@@ -28,7 +28,7 @@ namespace Dahmira.Models
         public string RowColor { get; set; } = "#FFFFFF";
         public string RowForegroundColor { get; set; } = "#808080";
 
-        public bool isDependency { get; set; } = false;
-        public ObservableCollection<Dependency> dependencies { get; set; } = new ObservableCollection<Dependency>();
+        public bool isDependency { get; set; } = false; //Есть ли зависимость у этого товара
+        public ObservableCollection<Dependency> dependencies { get; set; } = new ObservableCollection<Dependency>(); //Зависимости
     }
 }

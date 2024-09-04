@@ -19,10 +19,13 @@
     <None Remove="resources\images\download_to_clipboard.png" />
     <None Remove="resources\images\download_to_file.png" />
     <None Remove="resources\images\fast_search.png" />
+    <None Remove="resources\images\ico.ico" />
+    <None Remove="resources\images\play.png" />
     <None Remove="resources\images\refresh.png" />
     <None Remove="resources\images\save.png" />
     <None Remove="resources\images\search.png" />
     <None Remove="resources\images\sort.png" />
+    <None Remove="resources\images\stop.png" />
     <None Remove="resources\images\upload_from_clipboard.png" />
     <None Remove="resources\images\upload_from_file.png" />
     <None Remove="resources\images\without_image_database.png" />
@@ -53,10 +56,13 @@
     <Resource Include="resources\images\download_to_clipboard.png" />
     <Resource Include="resources\images\download_to_file.png" />
     <Resource Include="resources\images\fast_search.png" />
+    <Resource Include="resources\images\ico.ico" />
+    <Resource Include="resources\images\play.png" />
     <Resource Include="resources\images\refresh.png" />
     <Resource Include="resources\images\save.png" />
     <Resource Include="resources\images\search.png" />
     <Resource Include="resources\images\sort.png" />
+    <Resource Include="resources\images\stop.png" />
     <Resource Include="resources\images\upload_from_clipboard.png" />
     <Resource Include="resources\images\upload_from_file.png" />
     <Resource Include="resources\images\without_image_database.png" />

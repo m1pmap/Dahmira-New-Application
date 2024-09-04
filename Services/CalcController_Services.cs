@@ -30,14 +30,6 @@ namespace Dahmira.Services
                 CalcProduct item = calcItems[i];
                 List<Dependency> forRemove = new List<Dependency>();
 
-                IEnumerable<Dependency> dataForRemove = item.dependencies.OfType<Dependency>()
-                                                                      .Where(item => item.ProductName == string.Empty);
-
-                foreach (var removeItem in dataForRemove.Cast<Dependency>().ToArray())
-                {
-                    item.dependencies.Remove(removeItem);
-                }
-
                 if(item.dependencies.Count == 0) 
                 {
                     item.isDependency = false;
@@ -45,6 +37,7 @@ namespace Dahmira.Services
                 }
                 else
                 {
+                    //Перечисление всех зависимостей и получение результата
                     foreach (var dep in item.dependencies)
                     {
                         CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dep.ProductName);
@@ -98,33 +91,33 @@ namespace Dahmira.Services
                     fullCost += item.TotalCost;
                 }
 
-                if (item.ProductName == string.Empty)
+                if (item.ProductName == string.Empty) //Если это раздел, то изменяем ему фон на желтый
                 {
                     item.RowColor = CalcController.ColorToHex(Colors.LightYellow);
                     item.RowForegroundColor = CalcController.ColorToHex(Colors.Gray);
                 }
-                if (item.RowColor == CalcController.ColorToHex(Colors.MediumSeaGreen))
+                if (item.RowColor == CalcController.ColorToHex(Colors.MediumSeaGreen)) //Если цвет зелёный, то оставляем цвет таким же
                 {
                     item.RowColor = CalcController.ColorToHex(Colors.MediumSeaGreen);
                     item.RowForegroundColor = CalcController.ColorToHex(Colors.White);
                     selectFordependency = item;
                     isNowAddToDependencies = true;
                 }
-                else
+                else //Иначе делаем все поля прозрачными с серым цветом
                 {
                     item.RowColor = CalcController.ColorToHex(Colors.Transparent);
                     item.RowForegroundColor = CalcController.ColorToHex(Colors.Gray);
                 }
             }
 
-            var selectedItem = (CalcProduct)CalcGrid.SelectedItem;
+            var selectedItem = (CalcProduct)CalcGrid.SelectedItem; //Получаем выбранный элемент
             if(selectedItem != null)
             {
-                if(isNowAddToDependencies)
+                if(isNowAddToDependencies) //Если сейчас идёт добавление
                 {
-                    selectedItem = selectFordependency;
+                    selectedItem = selectFordependency; //Меняем выбранный элемент на то, в который идёт добавление
                 }
-                foreach (var dependency in selectedItem.dependencies)
+                foreach (var dependency in selectedItem.dependencies) //Отображение всех зависимостей
                 {
                     CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dependency.ProductName);
                     foundProduct.RowColor = CalcController.ColorToHex(Colors.LightGreen);
@@ -194,7 +187,6 @@ namespace Dahmira.Services
 
                     Refresh(CalcGrid, window.calcItems, fullCost_label); //Обновление
                     window.isCalcSaved = false;
-                    window.ComboBoxAllProductNameValues.Add(newCalcProductItem.ProductName);
                     return true;
                 }
                 else

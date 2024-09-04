@@ -17,5 +17,6 @@ namespace Dahmira.Interfaces
         public void ImportCountriesFromFTP(); //Импорт стран с фтп сервера 
         public void ExportCalcToFile(MainWindow window); //Экспорт расчётки в файл
         public void ImportCalcFromFile(MainWindow window); //Испорт расчётки из файла
+        public void ImportDBFromFTP(MainWindow window); //Получение БД с сервера
     }
 }
