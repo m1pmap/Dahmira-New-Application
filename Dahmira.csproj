@@ -14,6 +14,8 @@
     <None Remove="resources\images\calcToExcel.png" />
     <None Remove="resources\images\calcToNewSheetExcel.png" />
     <None Remove="resources\images\chapter.png" />
+    <None Remove="resources\images\CheckDidderencies_false.png" />
+    <None Remove="resources\images\CheckDidderencies_true.png" />
     <None Remove="resources\images\delete_image.png" />
     <None Remove="resources\images\delete_manufacturer.png" />
     <None Remove="resources\images\download_to_clipboard.png" />
@@ -51,6 +53,8 @@
     <Resource Include="resources\images\calcToExcel.png" />
     <Resource Include="resources\images\calcToNewSheetExcel.png" />
     <Resource Include="resources\images\chapter.png" />
+    <Resource Include="resources\images\CheckDidderencies_false.png" />
+    <Resource Include="resources\images\CheckDidderencies_true.png" />
     <Resource Include="resources\images\delete_image.png" />
     <Resource Include="resources\images\delete_manufacturer.png" />
     <Resource Include="resources\images\download_to_clipboard.png" />

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dahmira"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1080" Width="1920" WindowStyle="ThreeDBorderWindow" Closed="Window_Closed" Icon="/resources/images/ico.ico">
+        Title="MainWindow" Height="1080" Width="1920" WindowStyle="ThreeDBorderWindow" Closed="Window_Closed" Icon="/resources/images/ico.ico" PreviewKeyDown="CalcDataGrid_PreviewKeyDown">
 
     <!--Стиль для кнопок с закруглёнными краями-->
     <Window.Resources>
@@ -58,6 +58,7 @@
                     </Style>
                 </Setter.Value>
             </Setter>
+            
             <Setter Property="CellStyle">
                 <Setter.Value>
                     <Style TargetType="DataGridCell">
@@ -785,29 +786,67 @@
                         </Button>
                     </StackPanel>
                     <DataGrid x:Name="dataBaseGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="Transparent"
-                              SelectionChanged="dataBaseGrid_SelectionChanged" RowHeight="30" MinRowHeight="30"
+                              SelectionChanged="dataBaseGrid_SelectionChanged" MinRowHeight="30"
                               MouseDoubleClick="dataBaseGrid_MouseDoubleClick"
                               CanUserAddRows="False" FontFamily="Arial Black" Foreground="Gray"
                               RowHeaderWidth="0" SelectedIndex="0">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Производитель" Binding="{Binding Manufacturer}" Width="20*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Наименование"  Binding="{Binding ProductName}" Width="50*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Артикул"  Binding="{Binding Article}" Width="20*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Ед. измерения"  Binding="{Binding Unit}" Width="7*" MinWidth="75" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Производитель" Binding="{Binding Manufacturer}" Width="20*" MinWidth="100" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Наименование"  Binding="{Binding ProductName}" Width="50*" MinWidth="100" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Артикул"  Binding="{Binding Article}" Width="20*" MinWidth="100" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Ед. измерения"  Binding="{Binding Unit}" Width="7*" MinWidth="75" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
                             <DataGridTemplateColumn Header="Изображение" Width="10*" MinWidth="50" IsReadOnly="True">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding Photo, Converter={StaticResource ByteArrayToImageSourceConverter}}" Width="Auto" Height="Auto" MaxWidth="100" MaxHeight="100" MinHeight="20" MinWidth="20"/>
+                                        <Image Source="{Binding Photo, Converter={StaticResource ByteArrayToImageSourceConverter}}" Width="30" Height="30" MaxWidth="100" MaxHeight="100" MinHeight="20" MinWidth="20" Margin="-3"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Цена"  Binding="{Binding Cost}" Width="5*" MinWidth="75" IsReadOnly="True"></DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Цена"  Binding="{Binding Cost}" Width="5*" MinWidth="75" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
 
                 <!--Сетка с элементами управления и dataGrid расчётки-->
-                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Hidden">
+                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,10" Visibility="Hidden" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="953*"/>
                         <ColumnDefinition Width="957*"/>
@@ -840,6 +879,18 @@
                                 Click="CalcRefresh_button_Click">
 
                             <Image Source="pack://application:,,,/resources/images/refresh.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                        </Button>
+
+                        <Button x:Name="CheckDidderencies_button"
+                                Template="{StaticResource btTemplate}" 
+                                Height="40" Width="40"
+                                Background="MediumSeaGreen" 
+                                VerticalAlignment="Top" 
+                                Margin="0,0,5,0" 
+                                ToolTip="Проверить соответствие с Базой Данных"
+                                Click="CheckDidderencies_button_Click">
+
+                            <Image x:Name="CheckDidderencies_image" Source="pack://application:,,,/resources/images/CheckDidderencies_true.png" Height="30" Width="30" Margin="-30,0,0,0"/>
                         </Button>
 
                         <Button x:Name="CalcChapter_button"
@@ -890,8 +941,7 @@
                             <Image Source="pack://application:,,,/resources/images/calcToNewSheetExcel.png" Height="30" Width="50" VerticalAlignment="Top" Margin="-30,0,0,0"/>
                         </Button>
                     </StackPanel>
-                    <DataGrid x:Name="CalcDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="White" Foreground="Gray" FontFamily="Arial Black"
-                              RowHeight="30" MinRowHeight="30"
+                    <DataGrid x:Name="CalcDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="White" Foreground="Gray" FontFamily="Arial Black" 
                               CanUserAddRows="False" HorizontalScrollBarVisibility="Disabled" RowHeaderWidth="0"
                               SelectedCellsChanged="CalcdataGrid_SelectedCellsChanged"
                               CurrentCellChanged="CalcDataGrid_CurrentCellChanged" Grid.ColumnSpan="2"
@@ -902,7 +952,7 @@
                                     <Style TargetType="{x:Type TextBlock}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding isDependency, Mode=OneWay}" Value="True">
-                                                <Setter   Property="Background" Value="LightPink"/>
+                                                <Setter Property="Background" Value="LightPink"/>
                                                 <Setter Property="Margin" Value="-5"/>
                                                 <Setter Property="Padding" Value="6,6,0,0"/>
                                                 <Setter Property="Foreground" Value="White"/>
@@ -912,23 +962,83 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <DataGridTextColumn Header="Производитель" Binding="{Binding Manufacturer}" Width="10*" MinWidth="120" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Наименование"  Binding="{Binding ProductName}" Width="40*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Артикул"  Binding="{Binding Article}" Width="6*" MinWidth="70" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Ед. измерения"  Binding="{Binding Unit}" Width="6*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTemplateColumn Header="Изображение" Width="10*" MinWidth="50" IsReadOnly="True">
+                            <DataGridTextColumn Header="Производитель" Binding="{Binding Manufacturer}" Width="6*" MinWidth="120" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Наименование"  Binding="{Binding ProductName}" Width="30*" MinWidth="50" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Артикул"  Binding="{Binding Article}" Width="6*" MinWidth="70" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Ед. измерения"  Binding="{Binding Unit}" Width="5*" MinWidth="50" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTemplateColumn Header="Изображение" Width="5*" MinWidth="50" IsReadOnly="True">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image Source="{Binding Photo, Converter={StaticResource ByteArrayToImageSourceConverter}}" Width="Auto" Height="Auto" MaxWidth="100" MaxHeight="100" MinHeight="20" MinWidth="20"/>
+                                        <Image Source="{Binding Photo, Converter={StaticResource ByteArrayToImageSourceConverter}}" Width="30" Height="30" MaxWidth="40" MaxHeight="40" MinHeight="20" MinWidth="20" Margin="-3"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Цена"  Binding="{Binding Cost, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="75" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Количество"  Binding="{Binding Count, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="50" IsReadOnly="False"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Итоговая цена"  Binding="{Binding TotalCost, Converter={StaticResource NullToEmptyStringConverter}}" Width="7*" MinWidth="75" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="ID"  Binding="{Binding ID, Converter={StaticResource NullToEmptyStringConverter}}" Width="2*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="ID Art."  Binding="{Binding ID_Art, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Примечание"  Binding="{Binding Note}" Width="6*" MinWidth="100" IsReadOnly="True"></DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Цена"  Binding="{Binding Cost, Converter={StaticResource NullToEmptyStringConverter}}" Width="3*" MinWidth="75" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Количество"  Binding="{Binding Count, Converter={StaticResource NullToEmptyStringConverter}}" Width="4*" MinWidth="50" IsReadOnly="False">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <DataGridTextColumn Header="Итоговая цена"  Binding="{Binding TotalCost, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="75" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            
+                            <!--<DataGridTextColumn Header="ID"  Binding="{Binding ID, Converter={StaticResource NullToEmptyStringConverter}}" Width="2*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
+                            <DataGridTextColumn Header="ID Art."  Binding="{Binding ID_Art, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>-->
+                            <DataGridTextColumn Header="Примечание"  Binding="{Binding Note}" Width="9*" MinWidth="100" IsReadOnly="False" >
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
                         </DataGrid.Columns>
 
                         <DataGrid.RowStyle>
@@ -952,6 +1062,10 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,-5,0,10">
                     <Label x:Name="fullCostType" Content="ИТОГО:" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="20" />
                     <Label x:Name="fullCost" Content="0" Margin="-2,0,10,0" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="20"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,-5,0,10">
+                    <Label Content="Редактируемый файл:" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="20" Margin="10,0,0,0"/>
+                    <Label x:Name="editedFileName" Content="-" Margin="-2,0,0,0" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="20"/>
                 </StackPanel>
             </Grid>
         </Border>

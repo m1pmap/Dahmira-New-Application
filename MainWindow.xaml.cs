@@ -32,6 +32,7 @@ using Material = Dahmira.DAL.Model.Material;
 using System.Runtime.Intrinsics.Arm;
 using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace Dahmira
 {
@@ -53,11 +54,12 @@ namespace Dahmira
 
         int oldCurrentProductIndex = 0; //Прошлый выбранный элемент в dataBaseGrid
 
-        private ObservableCollection<Material> dbItems; //Элементы в БД
+        public ObservableCollection<Material> dbItems; //Элементы в БД
         public ObservableCollection<CalcProduct> calcItems = new ObservableCollection<CalcProduct>(); //Элементы в расчётке
 
         private bool isAddtoDependency = false; //Указывает на то идёт ли сейчас добавление в расчётку
         private CalcProduct selectItemForDependencies; //Текущий выбранный элемент, в который идёт добавление зависимостей
+        private bool isCalcOpened = false;
 
         public MainWindow()
         {
@@ -330,14 +332,27 @@ namespace Dahmira
 
         private void deleteSelectedProduct_button_Click(object sender, RoutedEventArgs e) //Удаление выделенного элемента прайса
         {
-            try
+            var items = dataBaseGrid.SelectedItems;
+            //Создаем список для хранения выделенных элементов нужного типа
+            List<Material> selectedItems = new List<Material>();
+
+            // Перебираем выделенные элементы и добавляем их в список
+            foreach (var item in items)
             {
-                Material selectedItem = (Material)dataBaseGrid.SelectedItem; //Получение текущего выделенного элемента
-                dbItems.Remove(selectedItem); //Удаление
-                repository.DeleteMaterial(selectedItem); //Удаление
-                productsCount_label.Content = "из " + dataBaseGrid.Items.Count.ToString();
+                if (item is Material product) // Проверяем, является ли элемент CalcProduct
+                {
+                    selectedItems.Add(product); // Добавляем в список
+                }
             }
-            catch { }
+            if (selectedItems != null)
+            {
+                foreach (var item in selectedItems)
+                {
+                    dbItems.Remove(item);
+                    repository.DeleteMaterial(item);
+                }
+                dataBaseGrid.Items.Refresh();
+            }
         }
 
         private void deleteSelectedManufacturerProducts_button_Click(object sender, RoutedEventArgs e) //Удаление всех товаров выделенного производителя
@@ -382,7 +397,7 @@ namespace Dahmira
 
         private void priceCalcButton_Click(object sender, RoutedEventArgs e) //Переход на прайс и расчётку
         {
-            if (CalcDataGrid_Grid.Visibility == Visibility.Hidden) //Если открыта расчётка
+            if (CalcDataGrid_Grid.Visibility == Visibility.Hidden) //Если открыт прайс
             {
                 priceCalcButton.Content = "РАСЧЁТ->ПРАЙС";
 
@@ -395,8 +410,10 @@ namespace Dahmira
 
                 TotalCostRow_row.Height = new GridLength(39, GridUnitType.Pixel);
                 dataBaseBorder_border.CornerRadius = new CornerRadius(15, 15, 0, 0);
+
+                isCalcOpened = true;
             }
-            else //Если открыта прайс
+            else //Если открыть расчётка
             {
                 priceCalcButton.Content = "ПРАЙС->РАСЧЁТ";
 
@@ -408,6 +425,8 @@ namespace Dahmira
 
                 TotalCostRow_row.Height = new GridLength(0, GridUnitType.Pixel);
                 dataBaseBorder_border.CornerRadius = new CornerRadius(15, 15, 15, 15);
+
+                isCalcOpened = false;
             }
         }
 
@@ -423,29 +442,26 @@ namespace Dahmira
 
         private void CalcdataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e) //При смене текущего выделенного элемента расчётки
         {
-            try
+            //Отображении информации о текущем выделенном элементе
+            CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem; //Получение текущего выделенного элемента
+            if (selectedItem != null)
             {
-                //Отображении информации о текущем выделенном элементе
-                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem; //Получение текущего выделенного элемента
-                if (selectedItem != null)
+                if (selectedItem.ProductName == string.Empty) //Если нажат раздел
                 {
-                    if (selectedItem.ProductName == string.Empty) //Если нажат раздел
+                    CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative)); //Обнуление картинки, так как у раздела не может быть картинки
+                }
+                else
+                {
+                    var fileImageBytes = converter.ConvertFromFileImageToByteArray("without_image_database.png");
+                    if (BitConverter.ToString(fileImageBytes) == BitConverter.ToString(selectedItem.Photo)) //Если нет фотографии
                     {
-                        CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative)); //Обнуление картинки, так как у раздела не может быть картинки
+                        CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
                     }
                     else
                     {
-                        var fileImageBytes = converter.ConvertFromFileImageToByteArray("without_image_database.png");
-                        if (BitConverter.ToString(fileImageBytes) == BitConverter.ToString(selectedItem.Photo)) //Если нет фотографии
-                        {
-                            CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
-                        }
-                        else
-                        {
-                            // Вызов метода Convert для преобразования массива байтов в BitmapImage
-                            var converter = new ByteArrayToImageSourceConverter_Services();
-                            CalcProductImage.Source = (BitmapImage)converter.Convert(selectedItem.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
-                        }
+                        // Вызов метода Convert для преобразования массива байтов в BitmapImage
+                        var converter = new ByteArrayToImageSourceConverter_Services();
+                        CalcProductImage.Source = (BitmapImage)converter.Convert(selectedItem.Photo, typeof(BitmapImage), null, CultureInfo.CurrentCulture);
                     }
 
                     if (!isAddtoDependency)
@@ -455,18 +471,34 @@ namespace Dahmira
                     CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
                 }
             }
-            catch { }
         }
 
         private void CalcDeleteSelectedProduct_button_Click(object sender, RoutedEventArgs e) //Удаление выбранного товара из расчётки
         {
-            try
+
+            var items = CalcDataGrid.SelectedItems;
+            //Создаем список для хранения выделенных элементов нужного типа
+            List<CalcProduct> selectedItems = new List<CalcProduct>();
+
+            // Перебираем выделенные элементы и добавляем их в список
+            foreach (var item in items)
             {
-                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
-                calcItems.Remove(selectedItem);
-                CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+                if (item is CalcProduct product) // Проверяем, является ли элемент CalcProduct
+                {
+                    selectedItems.Add(product); // Добавляем в список
+                }
             }
-            catch { }
+
+            if (selectedItems != null)
+            {
+                foreach(var item in selectedItems)
+                {
+                    calcItems.Remove(item);
+                }
+                CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+                isCalcSaved = false;
+                CalcDataGrid.Focus();
+            }
         }
 
         private void CalcDataGrid_CurrentCellChanged(object sender, EventArgs e) //Когда заканчивается редактирование ячейки
@@ -515,14 +547,9 @@ namespace Dahmira
             try
             {
                 CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
-                if (selectedItem != null)
+                if (selectedItem != null && selectedItem.ProductName != string.Empty)
                 {
                     bool imageIsEdit = ImageUpdater.UploadImageFromFile(CalcProductImage); //Загрузка картинки
-                    //Если сейчас выбран раздел
-                    if (selectedItem.ProductName == null)
-                    {
-                        return;
-                    }
 
                     if (imageIsEdit) //Если картинку загрузили
                     {
@@ -542,15 +569,9 @@ namespace Dahmira
             try
             {
                 CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
-                if (selectedItem != null)
+                if (selectedItem != null && selectedItem.ProductName != string.Empty)
                 {
                     ImageUpdater.DeleteImage(CalcProductImage);
-
-                    //Если сейчас выбран раздел
-                    if (selectedItem.ProductName == null)
-                    {
-                        return;
-                    }
 
                     int index = CalcDataGrid.SelectedIndex;
                     calcItems[index].Photo = converter.ConvertFromFileImageToByteArray("without_image_database.png");
@@ -571,15 +592,9 @@ namespace Dahmira
             try
             {
                 CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
-                if (selectedItem != null)
+                if (selectedItem != null && selectedItem.ProductName != string.Empty)
                 {
                     bool imageIsEdit = ImageUpdater.UploadImageFromClipboard(CalcProductImage); //Загрузка картинки
-
-                    //Если сейчас выбран раздел
-                    if (selectedItem.ProductName == null)
-                    {
-                        return;
-                    }
 
                     if (imageIsEdit) //Если картинку загрузили
                     {
@@ -683,17 +698,34 @@ namespace Dahmira
 
         private void saveCaalc_menuItem_Click(object sender, RoutedEventArgs e) //Сохранение расчётки
         {
+            CalcDataGrid.SelectedItem = null;
             fileImporter.ExportCalcToFile(this);
             isCalcSaved = true;
         }
 
         private void openCalc_menuItem_Click(object sender, RoutedEventArgs e) //Открытие расчётки из файла
         {
+            if (isCalcSaved == false) //Если расчётка не сохранена
+            {
+                MessageBoxResult res = MessageBox.Show("Не желаете сохранить эту расчётку?", "", MessageBoxButton.YesNo, MessageBoxImage.Information);
+                isCalcSaved = true;
+                if (res == MessageBoxResult.Yes)
+                {
+                    CalcDataGrid.SelectedItem = null;
+                    saveCaalc_menuItem_Click(sender, e);
+                    return;
+                }
+            }
             fileImporter.ImportCalcFromFile(this);
             isCalcSaved = true;
             DependencyDataGrid.ItemsSource = dependencies; //Обнуление зависимостей
             CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
             CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+            if (!CalcController.CheckingDifferencesWithDB(CalcDataGrid, this))
+            {
+                CheckDidderencies_button.Background = new SolidColorBrush(Colors.Coral);
+                CheckDidderencies_image.Source = new BitmapImage(new Uri("resources/images/CheckDidderencies_false.png", UriKind.Relative));
+            }
         }
 
         private void newCalc_menuItem_Click(object sender, RoutedEventArgs e) //Создание новой расчётки
@@ -701,15 +733,19 @@ namespace Dahmira
             if(isCalcSaved == false) //Если расчётка не сохранена
             {
                 MessageBoxResult res = MessageBox.Show("Не желаете сохранить эту расчётку?", "", MessageBoxButton.YesNo, MessageBoxImage.Information);
-                if(res == MessageBoxResult.Yes) 
-                {
-                    fileImporter.ExportCalcToFile(this);
-                }
                 isCalcSaved = true;
+                if (res == MessageBoxResult.Yes) 
+                {
+                    CalcDataGrid.SelectedItem = null;
+                    saveCaalc_menuItem_Click(sender, e);
+                    return;
+                }
             }
             calcItems.Clear();
             DependencyDataGrid.ItemsSource = dependencies;
             CalcProductImage.Source = new BitmapImage(new Uri("resources/images/without_picture.png", UriKind.Relative));
+            editedFileName.Content = "-";
+            fullCost.Content = "0";
         }
 
         private void startStopAddingDependency_button_Click(object sender, RoutedEventArgs e)
@@ -844,7 +880,7 @@ namespace Dahmira
             if(isAddtoDependency) //Если сейчас идёт добавление
             {
                 CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem; //Текущий выбранный элемент
-                if (selectedItem != null && selectItemForDependencies != selectedItem) //Если элемент выбран и это не текущий для добавления
+                if (selectedItem != null && selectItemForDependencies != selectedItem && selectedItem.ProductName != string.Empty) //Если элемент выбран и это не текущий для добавления
                 {
                     if (selectItemForDependencies.dependencies.Count == 0) //Если до этого не было зависимостей, то появляется отметка зависимости
                     {
@@ -854,6 +890,7 @@ namespace Dahmira
                     selectItemForDependencies.dependencies.Add(new Dependency { ProductName = selectedItem.ProductName, SelectedType = "*", Multiplier = 1 });
                     CalcDataGrid.Items.Refresh();
                     CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+                    isCalcSaved = false;
                 }
             }
         }
@@ -895,6 +932,129 @@ namespace Dahmira
 
             //Закрываем текущее приложение
             System.Windows.Application.Current.Shutdown();
+        }
+
+        private void CalcDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            var items = CalcDataGrid.SelectedItems;
+
+            var options = new JsonSerializerOptions
+            {
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+            };
+            // Создаем список для хранения выделенных элементов нужного типа
+            List<CalcProduct> selectedItems = new List<CalcProduct>();
+
+            // Перебираем выделенные элементы и добавляем их в список
+            foreach (var item in items)
+            {
+                if (item is CalcProduct product) // Проверяем, является ли элемент CalcProduct
+                {
+                    selectedItems.Add(product); // Добавляем в список
+                }
+            }
+
+            if (items != null)
+            {
+                if (Keyboard.Modifiers == ModifierKeys.Control)
+                {
+                    if (e.Key == Key.C)
+                    {
+                        // Сериализация выделенных элементов в JSON
+                        var itemsToCopy = new List<CalcProduct>();
+                        foreach (var item in selectedItems)
+                        {
+                            if (item is CalcProduct product)
+                            {
+                                itemsToCopy.Add(product.Clone());
+                            }
+                        }
+                        string json = JsonSerializer.Serialize(itemsToCopy, options);
+                        Clipboard.SetText(json); // Сохраняем в буфер обмена
+                        e.Handled = true; // Указываем, что событие обработано
+                    }
+                    else if (e.Key == Key.X)
+                    {
+                        // Копируем и удаляем выделенные элементы
+                        var itemsToCopy = new List<CalcProduct>();
+                        foreach (var item in selectedItems)
+                        {
+                            if (item is CalcProduct product)
+                            {
+                                itemsToCopy.Add(product.Clone());
+                                calcItems.Remove(item);
+                            }
+                        }
+                        string json = JsonSerializer.Serialize(itemsToCopy, options);
+                        Clipboard.SetText(json); // Сохраняем в буфер обмена
+                        CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+                        e.Handled = true; // Указываем, что событие обработано
+                    }
+                    else if (e.Key == Key.V)
+                    {
+                        //Извлекаем из буфера обмена
+                        if (Clipboard.ContainsText())
+                        {
+                            try
+                            {
+                                string json = Clipboard.GetText();
+                                var itemsToPaste = JsonSerializer.Deserialize<List<CalcProduct>>(json, options);
+
+                                if (isCalcOpened) //Если открыта расчётка то вставляем в расчётку
+                                {
+                                    if (itemsToPaste != null)
+                                    {
+                                        for (int i = 0; i < itemsToPaste.Count; i++)
+                                        {
+                                            calcItems.Insert(CalcDataGrid.SelectedIndex + 1, itemsToPaste[i]);
+                                        }
+                                        CalcController.Refresh(CalcDataGrid, calcItems, fullCost);
+                                        e.Handled = true; // Указываем, что событие обработано
+                                    }
+                                }
+                                else //Если открыта не расчётка, то вставляем в основную бд, создав при этом новый элемент
+                                {
+                                    List<Material> materialsToPaste = new List<Material>();
+                                    foreach(var item in itemsToPaste)
+                                    {
+                                        if(!dbItems.Any(i => i.Article == item.Article) && item.ProductName != string.Empty)
+                                        {
+                                            Material newMaterial = new Material
+                                            {
+                                                Manufacturer = item.Manufacturer,
+                                                ProductName = item.ProductName,
+                                                Unit = item.Unit,
+                                                Article = item.Article,
+                                                Photo = item.Photo,
+                                                Cost = (float)item.RealCost
+                                            };
+
+                                            repository.Add_Material(newMaterial);
+                                            dbItems.Add(newMaterial);
+                                            dataBaseGrid.Items.Refresh();
+                                        }
+                                    }
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void CheckDidderencies_button_Click(object sender, RoutedEventArgs e)
+        {
+            if(!CalcController.CheckingDifferencesWithDB(CalcDataGrid, this)) //Если есть несоответствия
+            {
+                CheckDidderencies_button.Background = new SolidColorBrush(Colors.Coral);
+                CheckDidderencies_image.Source = new BitmapImage(new Uri("resources/images/CheckDidderencies_false.png", UriKind.Relative));
+            }
+            else //Если соответствия есть
+            {
+                CheckDidderencies_button.Background = new SolidColorBrush(Colors.MediumSeaGreen);
+                CheckDidderencies_image.Source = new BitmapImage(new Uri("resources/images/CheckDidderencies_true.png", UriKind.Relative));
+            }
         }
     }
 }

@@ -31,6 +31,12 @@ namespace Dahmira.Services
         {
             try
             {
+                if(window.calcItems[window.calcItems.Count - 1].ProductName == string.Empty)
+                {
+                    MessageBox.Show("Раздел не может находиться в конце расчётки");
+                    return;
+                }
+
                 ExcelPackage.LicenseContext = LicenseContext.Commercial; //Вид лицензии
 
                 var package = new ExcelPackage(); //Создание нового документа
@@ -195,6 +201,12 @@ namespace Dahmira.Services
         {
             try
             {
+                if (window.calcItems[window.calcItems.Count - 1].ProductName == string.Empty)
+                {
+                    MessageBox.Show("Раздел не может находиться в конце расчётки");
+                    return;
+                }
+
                 ExcelPackage.LicenseContext = LicenseContext.Commercial; //Лицензия
                 //Диалоговое окно открытия файла
                 OpenFileDialog openFileDialog = new OpenFileDialog
@@ -472,24 +484,32 @@ namespace Dahmira.Services
 
         void IFileImporter.ExportCalcToFile(MainWindow window) //Экспорт расчётки в файл
         {
-            var options = new JsonSerializerOptions
+            if(window.calcItems.Count > 0)
             {
-                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-            };
+                if (window.calcItems[window.calcItems.Count - 1].ProductName == string.Empty)
+                {
+                    MessageBox.Show("Раздел не может находиться в конце расчётки");
+                }
 
-            string jsonString = JsonSerializer.Serialize(window.calcItems, options);
+                var options = new JsonSerializerOptions
+                {
+                    NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+                };
 
-            SaveFileDialog saveFileDialog = new SaveFileDialog
-            {
-                Filter = "Json Files (*.json)|*.json",
-                Title = "Сохранить json файл",
-                InitialDirectory = window.settings.CalcFolderPath
-            };
+                string jsonString = JsonSerializer.Serialize(window.calcItems, options);
 
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                string filePath = saveFileDialog.FileName;
-                File.WriteAllText(filePath, jsonString);
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "Json Files (*.json)|*.json",
+                    Title = "Сохранить json файл",
+                    InitialDirectory = window.settings.CalcFolderPath
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    string filePath = saveFileDialog.FileName;
+                    File.WriteAllText(filePath, jsonString);
+                }
             }
         }
 
@@ -498,13 +518,14 @@ namespace Dahmira.Services
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Filter = "Json Files (*.json)|*.json",
-                Title = "Сохранить json файл",
+                Title = "Открыть json файл",
                 InitialDirectory = window.settings.CalcFolderPath
             };
 
             if (openFileDialog.ShowDialog() == true)
             {
                 string filePath = openFileDialog.FileName;
+                window.editedFileName.Content = Path.GetFileName(filePath);
                 string jsonString = File.ReadAllText(filePath);
                 window.calcItems.Clear();
                 var options = new JsonSerializerOptions
