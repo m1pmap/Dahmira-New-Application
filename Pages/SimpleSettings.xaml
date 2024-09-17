@@ -271,11 +271,12 @@
                               RowHeaderWidth="0"
                               AutoGenerateColumns="False"
                               SelectedCellsChanged="CountryDataGrid_SelectedCellsChanged"
-                              CurrentCellChanged="CountryDataGrid_CurrentCellChanged">
+                              CurrentCellChanged="CountryDataGrid_CurrentCellChanged"
+                              CellEditEnding="CountryDataGrid_CellEditEnding" Margin="0,0,0,22">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Страна" Binding="{Binding name}" Width="*" MinWidth="155"/>
                             <DataGridTextColumn Header="Коэффициент" Binding="{Binding coefficient}" Width="*" MinWidth="50"/>
-                            <DataGridTextColumn Header="Скидка" Binding="{Binding discount}" Width="*" MinWidth="50"/>
+                            <DataGridTextColumn Header="Скидка, %" Binding="{Binding discount}" Width="*" MinWidth="50"/>
                         </DataGrid.Columns>
                     </DataGrid>
 
@@ -331,9 +332,9 @@
                                 Foreground="White"
                                 Click="SaveCountries_button_Click">
                         </Button>
-
-
                     </StackPanel>
+                    
+                    <Label x:Name="lastDataUpdate" Content="ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ:" HorizontalAlignment="Left" VerticalAlignment="Bottom" Height="23" Foreground="Gray" Margin="0,0,0,-1"/>
 
                 </Grid>
             </TabItem>

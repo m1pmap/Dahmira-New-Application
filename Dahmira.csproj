@@ -6,9 +6,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>resources\images\ico.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="logo.gif" />
+    <None Remove="resources\gifs\logo.gif" />
     <None Remove="resources\images\add.png" />
     <None Remove="resources\images\arrow_left.png" />
     <None Remove="resources\images\calcToExcel.png" />
@@ -20,6 +23,7 @@
     <None Remove="resources\images\delete_manufacturer.png" />
     <None Remove="resources\images\download_to_clipboard.png" />
     <None Remove="resources\images\download_to_file.png" />
+    <None Remove="resources\images\exportCalcToPrice.png" />
     <None Remove="resources\images\fast_search.png" />
     <None Remove="resources\images\ico.ico" />
     <None Remove="resources\images\play.png" />
@@ -48,6 +52,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="logo.gif" />
+    <Resource Include="resources\gifs\logo.gif" />
     <Resource Include="resources\images\add.png" />
     <Resource Include="resources\images\arrow_left.png" />
     <Resource Include="resources\images\calcToExcel.png" />
@@ -59,6 +65,7 @@
     <Resource Include="resources\images\delete_manufacturer.png" />
     <Resource Include="resources\images\download_to_clipboard.png" />
     <Resource Include="resources\images\download_to_file.png" />
+    <Resource Include="resources\images\exportCalcToPrice.png" />
     <Resource Include="resources\images\fast_search.png" />
     <Resource Include="resources\images\ico.ico" />
     <Resource Include="resources\images\play.png" />

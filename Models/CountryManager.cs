@@ -11,12 +11,12 @@ namespace Dahmira.Models
     {
         private static CountryManager instance;
         public ObservableCollection<Manufacturer> allManufacturers { get; set; }
-        public ObservableCollection<Country> countries { get; set; }
 
+        public PriceManager priceManager = new PriceManager();
         private CountryManager()
         {
             allManufacturers = new ObservableCollection<Manufacturer> { };
-            countries = new ObservableCollection<Country> {  };
+            priceManager.countries = new ObservableCollection<Country> {  };
         }
 
         public static CountryManager Instance

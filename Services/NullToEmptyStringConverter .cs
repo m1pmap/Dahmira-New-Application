@@ -15,7 +15,8 @@ namespace Dahmira.Services
             // Проверяем, является ли значение null
             if (value == null || 
                (value is double && double.IsNaN((double)value)) || 
-               (value is int && (int)value == 0))
+               (value is int && (int)value == 0) ||
+               (value is string && (string)value == "0"))
             {
                 return "";
             }

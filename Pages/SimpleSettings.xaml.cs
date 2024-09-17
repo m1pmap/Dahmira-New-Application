@@ -41,7 +41,7 @@ namespace Dahmira.Pages
 
             mainWindow = window;
             //Заполнение данными CountryDataGrid
-            CountryDataGrid.ItemsSource = CountryManager.Instance.countries;
+            CountryDataGrid.ItemsSource = CountryManager.Instance.priceManager.countries;    
             colors = new ObservableCollection<ColorItem>
             {
                 new ColorItem("Красный", System.Drawing.Color.Red),
@@ -64,6 +64,8 @@ namespace Dahmira.Pages
             pdfResultsColors_comboBox.ItemsSource = colors;
 
             settings = s; //Получение настроек
+
+            lastDataUpdate.Content = "ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ: " + CountryManager.Instance.priceManager.lastUpdated.ToString();
 
             //Установка значений настроек
             //Общие настройки
@@ -187,11 +189,15 @@ namespace Dahmira.Pages
 
                 if (selectedItem != null)
                 {
-                    if (selectedItem.discount > 1)
+                    if (selectedItem.discount > 100)
                     {
-                        selectedItem.discount = 1;
+                        selectedItem.discount = 100;
                     }
                     if (selectedItem.discount < 0)
+                    {
+                        selectedItem.discount = 0;
+                    }
+                    if (selectedItem.coefficient == 1)
                     {
                         selectedItem.discount = 0;
                     }
@@ -298,8 +304,14 @@ namespace Dahmira.Pages
 
         private void SaveCountries_button_Click(object sender, RoutedEventArgs e)
         {
+            CountryManager.Instance.priceManager.lastUpdated = DateTime.Now;
             IFileImporter fileImporter = new FileImporter_Services();
             fileImporter.ExportCountriesToFTP();
+            lastDataUpdate.Content = "ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ: " + CountryManager.Instance.priceManager.lastUpdated.ToString();
+        }
+
+        private void CountryDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
         }
     }
 }

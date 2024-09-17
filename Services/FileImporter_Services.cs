@@ -31,12 +31,6 @@ namespace Dahmira.Services
         {
             try
             {
-                if(window.calcItems[window.calcItems.Count - 1].ProductName == string.Empty)
-                {
-                    MessageBox.Show("Раздел не может находиться в конце расчётки");
-                    return;
-                }
-
                 ExcelPackage.LicenseContext = LicenseContext.Commercial; //Вид лицензии
 
                 var package = new ExcelPackage(); //Создание нового документа
@@ -69,7 +63,7 @@ namespace Dahmira.Services
                 titleRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelTitleColor.GetColor());
 
                 //Установка стилей для всего рабочего пространства
-                ExcelRange Rng = worksheet.Cells[1, 1, window.calcItems.Count + 2, lastColumnIndex];
+                ExcelRange Rng = worksheet.Cells[1, 1, window.calcItems.Count + 2 - 1, lastColumnIndex];
                 Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 Rng.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 Rng.Style.WrapText = true;
@@ -96,7 +90,7 @@ namespace Dahmira.Services
                 worksheet.Column(lastColumnIndex).Width = 18.43;
 
                 // Записываем данные из DataGrid
-                for (int i = 0; i < window.calcItems.Count; i++)
+                for (int i = 0; i < window.calcItems.Count - 1; i++)
                 {
                     CalcProduct item = window.calcItems[i];
 
@@ -173,7 +167,7 @@ namespace Dahmira.Services
                     worksheet.Cells[i + 2, lastColumnIndex].Value = item.Note;
                 }
 
-                worksheet.Cells[window.calcItems.Count + 2, lastColumnIndex - 1].Value = window.settings.FullCostType + " " + window.fullCost.Content;
+                worksheet.Cells[window.calcItems.Count + 2 - 1, lastColumnIndex - 1].Value = window.settings.FullCostType + " " + window.calcItems[window.calcItems.Count - 1].TotalCost;
 
                 //Диалоговое окно для сохранения
                 SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -201,12 +195,6 @@ namespace Dahmira.Services
         {
             try
             {
-                if (window.calcItems[window.calcItems.Count - 1].ProductName == string.Empty)
-                {
-                    MessageBox.Show("Раздел не может находиться в конце расчётки");
-                    return;
-                }
-
                 ExcelPackage.LicenseContext = LicenseContext.Commercial; //Лицензия
                 //Диалоговое окно открытия файла
                 OpenFileDialog openFileDialog = new OpenFileDialog
@@ -256,7 +244,7 @@ namespace Dahmira.Services
                         titleRange.Style.Fill.BackgroundColor.SetColor(window.settings.ExcelTitleColor.GetColor());
 
                         //Установка стилей для всего рабочего пространства
-                        ExcelRange Rng = worksheet.Cells[1, 1, window.calcItems.Count + 2, lastColumnIndex];
+                        ExcelRange Rng = worksheet.Cells[1, 1, window.calcItems.Count + 2 - 1, lastColumnIndex];
                         Rng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                         Rng.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                         Rng.Style.WrapText = true;
@@ -283,7 +271,7 @@ namespace Dahmira.Services
                         worksheet.Column(lastColumnIndex).Width = 18.43;
 
                         // Записываем данные из DataGrid
-                        for (int i = 0; i < window.calcItems.Count; i++)
+                        for (int i = 0; i < window.calcItems.Count - 1; i++)
                         {
                             CalcProduct item = window.calcItems[i];
 
@@ -360,7 +348,7 @@ namespace Dahmira.Services
                             worksheet.Cells[i + 2, lastColumnIndex].Value = item.Note;
                         }
 
-                        worksheet.Cells[window.calcItems.Count + 2, lastColumnIndex - 1].Value = window.settings.FullCostType+ " " + window.fullCost.Content;
+                        worksheet.Cells[window.calcItems.Count + 2 - 1, lastColumnIndex - 1].Value = window.settings.FullCostType + " " + window.calcItems[window.calcItems.Count - 1].TotalCost;
 
                         package.Save();
                     }
@@ -410,19 +398,19 @@ namespace Dahmira.Services
 
         void IFileImporter.ImportCountriesFromFTP() //Импорт стран с фтп сервера
         {
+            string ftpFilePath = "/countries/countriesTest.json";
+            string localJsonString = string.Empty;
+            if (File.Exists("countries.json"))
+            {
+                localJsonString = File.ReadAllText("countries.json");
+            }
+            else
+            {
+                File.Create("countries.json");
+            }
+
             try
             {
-                string ftpFilePath = "/countries/countriesTest.json";
-                string localJsonString = string.Empty;
-                if (File.Exists("countries.json"))
-                {
-                    localJsonString = File.ReadAllText("countries.json");
-                }
-                else
-                {
-                    File.Create("countries.json");
-                }
-
                 string ftpJsonString = string.Empty;
                 
                 FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + ftpFilePath);
@@ -441,17 +429,18 @@ namespace Dahmira.Services
                 if (localJsonString != ftpJsonString)
                 {
                     MessageBox.Show("Менеджер цен не совпадал, но был обновлён");
-                    CountryManager.Instance.countries = JsonSerializer.Deserialize<ObservableCollection<Country>>(ftpJsonString);
+                    CountryManager.Instance.priceManager = JsonSerializer.Deserialize<PriceManager>(ftpJsonString);
                     File.WriteAllText("countries.json", ftpJsonString);
                 }
                 else
                 {
-                    CountryManager.Instance.countries = JsonSerializer.Deserialize<ObservableCollection<Country>>(localJsonString);
+                    CountryManager.Instance.priceManager = JsonSerializer.Deserialize<PriceManager>(localJsonString);
                 }
             }
             catch(Exception ex ) 
             {
                 MessageBox.Show(ex.Message);
+                CountryManager.Instance.priceManager = JsonSerializer.Deserialize<PriceManager>(localJsonString);
             }
         }
 
@@ -460,7 +449,7 @@ namespace Dahmira.Services
             try
             {
                 string ftpFilePath = "/countries/countriesTest.json";
-                string jsonString = JsonSerializer.Serialize(CountryManager.Instance.countries);
+                string jsonString = JsonSerializer.Serialize(CountryManager.Instance.priceManager);
                 File.WriteAllText("countries.json", jsonString);
 
                 FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + ftpFilePath);
@@ -486,11 +475,6 @@ namespace Dahmira.Services
         {
             if(window.calcItems.Count > 0)
             {
-                if (window.calcItems[window.calcItems.Count - 1].ProductName == string.Empty)
-                {
-                    MessageBox.Show("Раздел не может находиться в конце расчётки");
-                }
-
                 var options = new JsonSerializerOptions
                 {
                     NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
@@ -525,7 +509,7 @@ namespace Dahmira.Services
             if (openFileDialog.ShowDialog() == true)
             {
                 string filePath = openFileDialog.FileName;
-                window.editedFileName.Content = Path.GetFileName(filePath);
+                window.Title = "Dahmira         " + Path.GetFileName(filePath);
                 string jsonString = File.ReadAllText(filePath);
                 window.calcItems.Clear();
                 var options = new JsonSerializerOptions
