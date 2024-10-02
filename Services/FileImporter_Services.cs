@@ -31,6 +31,8 @@ namespace Dahmira.Services
         {
             try
             {
+                bool isSaved  = false;
+
                 ExcelPackage.LicenseContext = LicenseContext.Commercial; //Вид лицензии
 
                 var package = new ExcelPackage(); //Создание нового документа
@@ -183,11 +185,22 @@ namespace Dahmira.Services
                     worksheet.Protection.IsProtected = false;
                     worksheet.Protection.AllowSelectLockedCells = false;
                     package.SaveAs(new FileInfo(filePath));
+                    isSaved = true;
+                }
+
+                if (isSaved)
+                {
+                    window.CalcInfo_label.Content = "Расчёт успешно сохранён в Excel.";
+                }
+                else
+                {
+                    window.CalcInfo_label.Content = "Расчёт не сохранён в Excel.";
                 }
             }
             catch (Exception exp) 
             {
                 MessageBox.Show(exp.Message);
+                window.CalcInfo_label.Content = "Расчёт не сохранён в Excel.";
             }
         }
 
@@ -195,6 +208,8 @@ namespace Dahmira.Services
         {
             try
             {
+                bool isSaved = false;
+
                 ExcelPackage.LicenseContext = LicenseContext.Commercial; //Лицензия
                 //Диалоговое окно открытия файла
                 OpenFileDialog openFileDialog = new OpenFileDialog
@@ -351,14 +366,26 @@ namespace Dahmira.Services
                         worksheet.Cells[window.calcItems.Count + 2 - 1, lastColumnIndex - 1].Value = window.settings.FullCostType + " " + window.calcItems[window.calcItems.Count - 1].TotalCost;
 
                         package.Save();
+
+                        isSaved = true;
                     }
                 }
-        }
+
+                if(isSaved)
+                {
+                    window.CalcInfo_label.Content = "Расчётка успешно добавлена новым листом в существующий Excel файл.";
+                }
+                else
+                {
+                    window.CalcInfo_label.Content = "Расчёт не сохранён в существующий Excel.";
+                }
+            }
             catch(Exception exp) 
             {
                 MessageBox.Show(exp.Message);
+                window.CalcInfo_label.Content = "Расчёт не сохранён в существующий Excel.";
             }
-}
+        }
 
         void IFileImporter.ExportToPDF(bool isImporting) //Экспорт в PDF
         {
@@ -484,7 +511,7 @@ namespace Dahmira.Services
 
                 SaveFileDialog saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "Json Files (*.json)|*.json",
+                    Filter = "Json Files (*.DAH)|*.DAH",
                     Title = "Сохранить json файл",
                     InitialDirectory = window.settings.CalcFolderPath
                 };
@@ -492,6 +519,7 @@ namespace Dahmira.Services
                 if (saveFileDialog.ShowDialog() == true)
                 {
                     string filePath = saveFileDialog.FileName;
+                    window.CalcPath_label.Content = $"Имя файла расчёта: {Path.GetFileName(filePath)}";
                     File.WriteAllText(filePath, jsonString);
                 }
             }
@@ -501,7 +529,7 @@ namespace Dahmira.Services
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "Json Files (*.json)|*.json",
+                Filter = "Json Files (*.DAH)|*.DAH",
                 Title = "Открыть json файл",
                 InitialDirectory = window.settings.CalcFolderPath
             };
@@ -509,7 +537,7 @@ namespace Dahmira.Services
             if (openFileDialog.ShowDialog() == true)
             {
                 string filePath = openFileDialog.FileName;
-                window.Title = "Dahmira         " + Path.GetFileName(filePath);
+                window.CalcPath_label.Content = $"Имя файла расчёта: {Path.GetFileName(filePath)}";
                 string jsonString = File.ReadAllText(filePath);
                 window.calcItems.Clear();
                 var options = new JsonSerializerOptions
@@ -523,15 +551,43 @@ namespace Dahmira.Services
                     window.calcItems.Add(item);
                 }
                 window.allCountries_comboBox.SelectedIndex = 0;
+                window.isCalculationNeed = true;
+                window.MovingLabel.Visibility = Visibility.Visible;
             }
+        }
+
+        void IFileImporter.ImportCalcFromFile_StartDUH(string path, MainWindow window) //Испорт расчётки при запске dah файла
+        {
+
+
+            string filePath = path;
+            window.CalcPath_label.Content = $"Имя файла расчёта: {Path.GetFileName(filePath)}";
+            string jsonString = File.ReadAllText(filePath);
+            window.calcItems.Clear();
+            var options = new JsonSerializerOptions
+            {
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+            };
+
+            var newItems = JsonSerializer.Deserialize<ObservableCollection<CalcProduct>>(jsonString, options);
+
+            var in78 = 1;
+
+            window.calcItems.Clear();
+            foreach (var item in newItems)
+            {
+                window.calcItems.Add(item);
+            }
+            window.allCountries_comboBox.SelectedIndex = 0;
+
         }
 
         void IFileImporter.ImportDBFromFTP(MainWindow window)
         {
             string ftpFilePath = "/data_price_test/Dahmira_TestDb.mdf";
             string ftpFilePathLdf = "/data_price_test/Dahmira_TestDb_log.ldf";
-            string localFilePath = window.settings.PriceFolderPath + "/Dahmira_TestDb.mdf";
-            string localFilePathLdf = window.settings.PriceFolderPath + "/Dahmira_TestDb_log.ldf";
+            string localFilePath = window.settings.PriceFolderPath + "\\Dahmira_TestDb.mdf";
+            string localFilePathLdf = window.settings.PriceFolderPath + "\\Dahmira_TestDb_log.ldf";
             try
             {
                 // Создаем запрос для скачивания файла
@@ -565,6 +621,8 @@ namespace Dahmira.Services
                 }
 
                 MessageBox.Show("Файл успешно загружен");
+                window.Title = $"Dahmira       {localFilePath}";
+                window.settings.Price = localFilePath;
             }
             catch (Exception ex)
             {

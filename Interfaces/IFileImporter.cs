@@ -18,5 +18,8 @@ namespace Dahmira.Interfaces
         public void ExportCalcToFile(MainWindow window); //Экспорт расчётки в файл
         public void ImportCalcFromFile(MainWindow window); //Испорт расчётки из файла
         public void ImportDBFromFTP(MainWindow window); //Получение БД с сервера
+
+
+        public void ImportCalcFromFile_StartDUH(string path, MainWindow window); //Испорт расчётки при запске dah файла
     }
 }

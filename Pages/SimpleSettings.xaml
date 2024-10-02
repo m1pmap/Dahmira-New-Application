@@ -272,7 +272,8 @@
                               AutoGenerateColumns="False"
                               SelectedCellsChanged="CountryDataGrid_SelectedCellsChanged"
                               CurrentCellChanged="CountryDataGrid_CurrentCellChanged"
-                              CellEditEnding="CountryDataGrid_CellEditEnding" Margin="0,0,0,22">
+                              CellEditEnding="CountryDataGrid_CellEditEnding" Margin="0,0,0,22"
+                              PreviewKeyDown="CountryDataGrid_PreviewKeyDown">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Страна" Binding="{Binding name}" Width="*" MinWidth="155"/>
                             <DataGridTextColumn Header="Коэффициент" Binding="{Binding coefficient}" Width="*" MinWidth="50"/>

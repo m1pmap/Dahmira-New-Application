@@ -12,6 +12,7 @@ namespace Dahmira.Models
 {
     public class CalcProduct
     {
+        public int ID { get; set; } = 0;
         public int Num { get; set; } = 0; //Номер
         public string Manufacturer {  get; set; } = string.Empty; //Производитель
         public string ProductName { get; set; } = string.Empty; //Наименование товара
@@ -22,34 +23,35 @@ namespace Dahmira.Models
         public double Cost { get; set; } = double.NaN; //Цена товара (может изменяться в зависимости от страны)
         public string Count { get; set; } = "0"; //Количество
         public double TotalCost { get; set; } = double.NaN; //финальная цена
-        public int ID { get; set; } = 0; 
         public int ID_Art { get; set; } = 0;
         public string Note { get; set; } = string.Empty; //Примечания
         public string RowColor { get; set; } = "#FFFFFF";
         public string RowForegroundColor { get; set; } = "#000000";
-
         public bool isDependency { get; set; } = false; //Есть ли зависимость у этого товара
         public ObservableCollection<Dependency> dependencies { get; set; } = new ObservableCollection<Dependency>(); //Зависимости
 
         public CalcProduct Clone()
         {
-            return new CalcProduct { Num = this.Num,
-                                     Manufacturer = this.Manufacturer,
-                                     ProductName = this.ProductName,
-                                     Article = this.Article,
-                                     Unit = this.Unit,
-                                     Photo = this.Photo,
-                                     RealCost = this.RealCost,
-                                     Cost = this.Cost,
-                                     Count = this.Count,
-                                     TotalCost = this.TotalCost,
-                                     ID = this.ID,
-                                     ID_Art = this.ID_Art,
-                                     Note = this.Note,
-                                     RowColor = this.RowColor,
-                                     RowForegroundColor = this.RowForegroundColor,
-                                     isDependency = this.isDependency,
-                                     dependencies = this.dependencies, 
+                                     
+            return new CalcProduct
+            {
+                ID = this.ID,
+                Num = this.Num,
+                Manufacturer = this.Manufacturer,
+                ProductName = this.ProductName,
+                Article = this.Article,
+                Unit = this.Unit,
+                Photo = this.Photo,
+                RealCost = this.RealCost,
+                Cost = this.Cost,
+                Count = this.Count,
+                TotalCost = this.TotalCost,
+                ID_Art = this.ID_Art,
+                Note = this.Note,
+                RowColor = "#FFFFFF",
+                RowForegroundColor = "#000000",
+                isDependency = false,
+                dependencies = new ObservableCollection<Dependency>(), 
             };
         }
     }

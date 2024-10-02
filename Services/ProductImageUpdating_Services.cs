@@ -32,7 +32,7 @@ namespace Dahmira.Services
             return false;
         }
 
-        public void DownloadImageToFile(System.Windows.Controls.Image image) //Сохранение картинки в файл
+        public bool DownloadImageToFile(System.Windows.Controls.Image image) //Сохранение картинки в файл
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "PNG Image|*.png|JPEG Image|*.jpg;*.jpeg|All Files|*.*";
@@ -51,8 +51,9 @@ namespace Dahmira.Services
                     encoder.Save(fileStream);
                 }
 
-                MessageBox.Show("Изображение успешно сохранено!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                return true;
             }
+            return false;
         }
 
         public void DeleteImage(System.Windows.Controls.Image image)  //Удаление картинки
@@ -71,10 +72,8 @@ namespace Dahmira.Services
             }
             else
             {
-                MessageBox.Show("В буфере обмена нет изображения.");
+                return false;
             }
-
-            return false;
         }
 
         public void DownloadImageToClipboard(System.Windows.Controls.Image image) //Сохранение картинки в буфер обмена

@@ -312,6 +312,58 @@ namespace Dahmira.Pages
 
         private void CountryDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
+            if (e.Column.Header.ToString() == "Коэффициент" || e.Column.Header.ToString() == "Скидка, %")
+            {
+                string newTex = ((TextBox)e.EditingElement).Text;
+
+
+                if (string.IsNullOrWhiteSpace(newTex)) //Если текст пустой
+                {
+                    ((TextBox)e.EditingElement).Text = "0";
+                }
+                else
+                {
+                    bool oneSymbol = false; //Флаг для отслеживания наличия точки
+                    string validNumber = ""; //Строка для хранения валидного числа
+
+                    for (int i = 0; i < newTex.Length; i++)
+                    {
+                        char currentChar = newTex[i];
+
+                        if (char.IsDigit(currentChar)) //Если символ цифра
+                        {
+                            validNumber += currentChar; //Добавление символа
+                        }
+                        else if (currentChar == '.' && !oneSymbol) //Если символ точка и её ещё не было
+                        {
+                            validNumber += currentChar; //Добавление точки
+                            oneSymbol = true;
+                        }
+                    }
+
+                    // Если число пустое или состоит только из точки
+                    if (string.IsNullOrEmpty(validNumber) || validNumber == ".")
+                    {
+                        ((TextBox)e.EditingElement).Text = "0";
+                    }
+                    else
+                    {
+                        ((TextBox)e.EditingElement).Text = validNumber;
+                    }
+                }
+            }
+        }
+
+        private void CountryDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete) // Проверяем, нажата ли клавиша Delete
+            {
+                Country selectedCountry = (Country)CountryDataGrid.SelectedItem;
+                if (selectedCountry != null)
+                {
+                    CountryManager.Instance.priceManager.countries.Remove(selectedCountry);
+                }
+            }
         }
     }
 }

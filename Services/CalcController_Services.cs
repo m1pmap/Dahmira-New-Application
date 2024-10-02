@@ -4,6 +4,7 @@ using Dahmira.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,44 +27,40 @@ namespace Dahmira.Services
 
             for (int i = 0; i < calcItems.Count - 1; i++) //Перебор всех элементов
             {
-                double count = 0;
                 CalcProduct item = calcItems[i];
-
-                if(item.dependencies.Count == 0) 
+                double count = Convert.ToDouble(item.Count);
+                if(item.isDependency == true)
                 {
-                    item.isDependency = false;
-                    count = Convert.ToDouble(item.Count);
+                    count = 0;
                 }
-                else
+
+                //Перечисление всех зависимостей и получение результата
+                foreach (var dep in item.dependencies)
                 {
-                    //Перечисление всех зависимостей и получение результата
-                    foreach (var dep in item.dependencies)
+                    CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dep.ProductName);
+                    if(foundProduct != null)
                     {
-                        CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dep.ProductName);
-                        if(foundProduct != null)
+                        switch (dep.SelectedType)
                         {
-                            switch (dep.SelectedType)
+                            case "*":
+                                {
+                                    count += Convert.ToDouble(foundProduct.Count) * dep.Multiplier;
+                                    break;
+                                }
+                            case "+":
+                                {
+                                    count += Convert.ToDouble(foundProduct.Count) + dep.Multiplier;
+                                    break;
+                                }
+                            case "-":
                             {
-                                case "*":
-                                    {
-                                        count += Convert.ToDouble(foundProduct.Count) * dep.Multiplier;
-                                        break;
-                                    }
-                                case "+":
-                                    {
-                                        count += Convert.ToDouble(foundProduct.Count) + dep.Multiplier;
-                                        break;
-                                    }
-                                case "-":
-                                    {
-                                        count += Convert.ToDouble(foundProduct.Count) - dep.Multiplier;
-                                        break;
-                                    }
-                                case "/":
-                                    {
-                                        count += Convert.ToDouble(foundProduct.Count) / dep.Multiplier;
-                                        break;
-                                    }
+                                count += Convert.ToDouble(foundProduct.Count) - dep.Multiplier;
+                                break;
+                            }
+                            case "/":
+                            {
+                                count += Convert.ToDouble(foundProduct.Count) / dep.Multiplier;
+                                break;
                             }
                         }
                     }
@@ -93,14 +90,14 @@ namespace Dahmira.Services
                     fullCost += item.TotalCost;
                 }
 
-                if (item.ProductName == string.Empty) //Если это раздел, то изменяем ему фон на желтый
+                if (item.ProductName == string.Empty && item.ID == 0) //Если это раздел, то изменяем ему фон на желтый
                 {
                     item.RowColor = ColorToHex(Colors.LightBlue);
                     item.RowForegroundColor = ColorToHex(Colors.Black);
                 }
                 else
                 {
-                    if (item.RowColor == ColorToHex(Colors.Coral)) //Если цвет зелёный, то оставляем цвет таким же
+                    if (item.RowColor == ColorToHex(Colors.Coral))
                     {
                         item.RowColor = ColorToHex(Colors.Coral);
                         item.RowForegroundColor = ColorToHex(Colors.White);
@@ -114,9 +111,9 @@ namespace Dahmira.Services
                         }
                         else
                         {
-                            if (item.RowColor == ColorToHex(Colors.MediumSeaGreen)) //Если цвет зелёный, то оставляем цвет таким же
+                            if (item.RowColor == ColorToHex(Colors.CornflowerBlue)) //Если цвет зелёный, то оставляем цвет таким же
                             {
-                                item.RowColor = ColorToHex(Colors.MediumSeaGreen);
+                                item.RowColor = ColorToHex(Colors.CornflowerBlue);
                                 item.RowForegroundColor = ColorToHex(Colors.White);
                                 selectFordependency = item;
                                 isNowAddToDependencies = true;
@@ -141,10 +138,10 @@ namespace Dahmira.Services
                 }
                 foreach (var dependency in selectedItem.dependencies) //Отображение всех зависимостей
                 {
-                    CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dependency.ProductName);
+                    CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ID == dependency.ProductId);
                     if(foundProduct != null)
                     {
-                        foundProduct.RowColor = ColorToHex(Colors.LightGreen);
+                        foundProduct.RowColor = ColorToHex(Colors.MediumSeaGreen);
                         foundProduct.RowForegroundColor = ColorToHex(Colors.White);
                     }
                 }
@@ -163,9 +160,20 @@ namespace Dahmira.Services
                     Material selectedDBItem = (Material)DBGrid.SelectedItem; //Текущий выбранный элемент в БД
                     int selectedCalcItemIndex = CalcGrid.SelectedIndex; //Индекс текущего выбранного элемента в расчётке
 
+                    int maxId = 0;
+
+                    foreach(var item in window.calcItems)
+                    {
+                        if(maxId < item.ID)
+                        {
+                            maxId = item.ID;
+                        }
+                    }
+
                     //Создание нового элемента расчётки
                     CalcProduct newCalcProductItem = new()
                     {
+                        ID = maxId + 1,
                         Num = window.calcItems.Count + 1,
                         Manufacturer = selectedDBItem.Manufacturer,
                         ProductName = selectedDBItem.ProductName,
@@ -183,12 +191,21 @@ namespace Dahmira.Services
                     {
                         case "Last": //В конец
                             {
+                                window.PriceInfo_label.Content = $"Строка {DBGrid.SelectedIndex + 1 } прайса добавлена под {window.calcItems.Count - 1} в расчёте.";
                                 window.calcItems.Insert(window.calcItems.Count - 1, newCalcProductItem);
+                                window.WarningFlashing("Добавлено!", window.WarningBorder, window.WarningLabel, Colors.MediumSeaGreen, 1);
                                 break;
                             }
                         case "UnderSelect": //Под выбранным
                             {
-                                if(CalcGrid.SelectedIndex != window.calcItems.Count - 1)
+
+                                if (CalcGrid.SelectedItem == null)
+                                {
+                                    window.PriceInfo_label.Content = $"Строка прайса не добавлена в расчёт. Для начала выберите строку в расчёте.";
+                                    break;
+                                }
+                                window.PriceInfo_label.Content = $"Строка {DBGrid.SelectedIndex + 1} прайса добавлена под {CalcGrid.SelectedIndex + 1} в расчёте.";
+                                if (CalcGrid.SelectedIndex != window.calcItems.Count - 1)
                                 {
                                     window.calcItems.Insert(selectedCalcItemIndex + 1, newCalcProductItem);
                                 }
@@ -196,13 +213,21 @@ namespace Dahmira.Services
                                 {
                                     window.calcItems.Insert(selectedCalcItemIndex, newCalcProductItem);
                                 }
+                                window.WarningFlashing("Добавлено!", window.WarningBorder, window.WarningLabel, Colors.MediumSeaGreen, 1);
                                 break;
                             }
                         case "Replace": //Заменить
                             {
+                                if (CalcGrid.SelectedItem == null)
+                                {
+                                    window.PriceInfo_label.Content = $"Строка не заменена. Для начала выберите строку в расчёте.";
+                                    break;
+                                }
                                 if (CalcGrid.SelectedIndex != window.calcItems.Count - 1)
                                 {
+                                    window.PriceInfo_label.Content = $"Строка {DBGrid.SelectedIndex + 1} прайса заменила {CalcGrid.SelectedIndex + 1} в расчёте.";
                                     window.calcItems[selectedCalcItemIndex] = newCalcProductItem;
+                                    window.WarningFlashing("Добавлено!", window.WarningBorder, window.WarningLabel, Colors.MediumSeaGreen, 1);
                                 }
                                 break;
                             }
@@ -219,11 +244,11 @@ namespace Dahmira.Services
             }
             catch 
             {
-                return true;
+                return false;
             }            
         }
 
-        public void ObjectFlashing(Button target, Color initialColor, Color flashingColor) //Анимация мигания выбранной кнопки и выбранными цветами
+        public void ObjectFlashing(Border target, Color initialColor, Color flashingColor, double interval) //Анимация мигания выбранной кнопки и выбранными цветами
         {
             // Создаем анимацию
             var storyboard = new Storyboard();
@@ -233,9 +258,9 @@ namespace Dahmira.Services
             {
                 From = initialColor,
                 To = flashingColor,
-                Duration = new Duration(TimeSpan.FromMilliseconds(350)),
+                Duration = new Duration(TimeSpan.FromMilliseconds(750)),
                 AutoReverse = true,
-                RepeatBehavior = new RepeatBehavior(3) // Количество миганий
+                RepeatBehavior = new RepeatBehavior(interval) // Количество миганий
             };
 
             // Применяем анимацию к фону кнопки
@@ -252,6 +277,26 @@ namespace Dahmira.Services
         public string ColorToHex(Color color)
         {
             return $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+        }
+
+        public Color HexToColor(string hex)
+        {
+            // Удаляем символ '#' если он есть
+            hex = hex.Replace("#", "");
+
+            // Если длина строки 6, добавляем 2 символа для альфа-канала (полностью непрозрачный)
+            if (hex.Length == 6)
+            {
+                hex = "FF" + hex;
+            }
+
+            // Преобразуем HEX в ARGB
+            byte a = byte.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+            byte r = byte.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
+            byte g = byte.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
+            byte b = byte.Parse(hex.Substring(6, 2), NumberStyles.HexNumber);
+
+            return Color.FromArgb(a, r, g, b);
         }
 
         void ICalcController.UpdateCellStyle(DataGrid dataGrid, Brush backgroundColor, Brush foregroundColor)
@@ -324,13 +369,11 @@ namespace Dahmira.Services
                         if (!ArePhotosEqual(item.Photo, dbMaterial.Photo)) //Если фото не равны
                         {
                             item.Photo = dbMaterial.Photo;
-                            //item.RowColor = ColorToHex(Colors.Coral);
-                            //item.RowForegroundColor = ColorToHex(Colors.White);
                             isDifferent = true;
                         }
                         if(item.ProductName != dbMaterial.ProductName || item.Manufacturer != dbMaterial.Manufacturer)
                         {
-                            item.RowColor = ColorToHex(Colors.Coral);
+                            item.RowColor = ColorToHex(Colors.LightGray);
                             item.RowForegroundColor = ColorToHex(Colors.White);
 
                             CalcDataGrid.Items.Refresh();
@@ -359,40 +402,42 @@ namespace Dahmira.Services
                         item.RowColor = ColorToHex(Colors.OrangeRed);
                         item.RowForegroundColor = ColorToHex(Colors.White);
                         CalcDataGrid.Items.Refresh();
-                        MessageBox.Show("Производитель: " + item.Manufacturer + "\nНаименование: " + item.ProductName, "Товар отсутствует в Базе Данных", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Артикула нет в прайсе!" +
+                                        "\nОтсутствующий артикул подсвечен красным." +
+                                        "\nНомер элемента: " + item.Num.ToString() +
+                                        "\nПроизводитель: " + item.Manufacturer + 
+                                        "\nНаименование: " + item.ProductName + 
+                                        "\nАртикул " + item.Article, "Товар отсутствует в Базе Данных", MessageBoxButton.OK, MessageBoxImage.Error);;
                         isDifferent = true;
                     }
                 }
                 CalcDataGrid.Items.Refresh();
+                window.CalcInfo_label.Content = "Нарушено соответствие с Базой Данных.";
             }
 
-            if(!isDifferent) 
+            if (!isDifferent) 
             {
                 MessageBox.Show("Соответствие с Базой Данных не нарушена", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                window.CalcInfo_label.Content = "Соответствие с Базой Данных не нарушена.";
             }
+        }
 
-
-            //if (isRemovedOnDB)
-            //{
-            //    if(isDifferent) 
-            //    {
-            //        MessageBox.Show("Красным выделены товары, которых нет в Базе Данных\nОранжевым - те, что имели несоответствие по фото с Базой Данных, но уже исправлены", "Несоответствие с Базой Данных", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Выделены товары, которых нет в Базе Данных", "Несоответствие с Базой Данных", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    }
-            //    return false;
-            //}
-            //if (isDifferent)
-            //{
-            //    MessageBox.Show("Выделеные товары, имеющие несоответствие по фото с Базой Данных, но уже исправлены", "Несоответствие с Базой Данных", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Соответствие с Базой Данных не нарушена", "", MessageBoxButton.OK, MessageBoxImage.Information);
-            //}
-            //return true;
+        public void Calculation(MainWindow window)
+        {
+            foreach (var item in window.calcItems)
+            {
+                if (item.ProductName != string.Empty) //Если не раздел
+                {
+                    if(window.dbItems.Any(i => i.Article == item.Article))
+                    {
+                        Material material = window.dbItems.First(i => i.Article == item.Article);
+                        if (material.Cost != item.RealCost)
+                        {
+                            item.RealCost = material.Cost;
+                        }
+                    }
+                }
+            }
         }
 
         public void ClearBackgroundsColors(MainWindow window)
