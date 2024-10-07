@@ -1,0 +1,46 @@
+﻿<Window x:Class="Dahmira.Pages.FastSearch"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dahmira.Pages"
+        mc:Ignorable="d"
+        Title="Поиск внутри базы" Height="137" Width="316" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <!--Стиль для кнопки с закруглёнными краями-->
+        <ControlTemplate TargetType="Button" x:Key="btTemplate">
+            <Border x:Name="border"
+     CornerRadius="4" 
+     Background="{TemplateBinding Background}">
+                <Grid 
+             HorizontalAlignment="Center" 
+             VerticalAlignment="Center">
+                    <ContentPresenter HorizontalAlignment="Center" 
+                               VerticalAlignment="Center" 
+                               Content="{TemplateBinding Content}" 
+                               ContentTemplate="{TemplateBinding ContentTemplate}"/>
+                </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter TargetName="border" Property="Background" Value="LightBlue"/>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <StackPanel Margin="5">
+            <CheckBox x:Name="checkBox" Margin="5" Content="Искать ниже с выделенной строки" Foreground="Gray" Checked="checkBox_Checked"></CheckBox>
+            <TextBox x:Name="searchingText" Height="22" Margin="5,0,5,0" Foreground="Gray" FontSize="14" Width="auto" FontFamily="Arial Black" TextChanged="searchingText_TextChanged"/>
+            <Button x:Name="Search_button" 
+                    Margin="5" Content="ПОИСК" FontFamily="Arial Black" Height="25"
+                    Template="{StaticResource btTemplate}" 
+                    FontSize="12" 
+                    Foreground="White" 
+                    Background="#a3a3a4"
+                    Click="Search_button_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

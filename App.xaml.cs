@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 using System.Data;
+using System.IO;
 using System.Windows;
 
 namespace Dahmira
@@ -12,6 +13,9 @@ namespace Dahmira
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            //Устанавливаем рабочую директорию на папку с исполняемым файлом приложения
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
             //Тепрь запускаем главное окно ручками
             MainWindow mainWindow = new MainWindow();

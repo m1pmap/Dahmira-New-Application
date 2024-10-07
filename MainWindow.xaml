@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dahmira"
         mc:Ignorable="d"
-        Title="Dahmira" Height="1080" Width="1920" WindowStyle="ThreeDBorderWindow" Closed="Window_Closed" PreviewKeyDown="CalcDataGrid_PreviewKeyDown" Closing="Window_Closing">
+        Title="Dahmira" Height="1080" Width="1920" WindowStyle="ThreeDBorderWindow" PreviewKeyDown="CalcDataGrid_PreviewKeyDown" Closing="Window_Closing">
 
     <!--Стиль для кнопок с закруглёнными краями-->
     <Window.Resources>
@@ -70,12 +70,13 @@
                                 <Setter Property="Foreground" Value="White" />
                             </Trigger>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="Background" Value="CornflowerBlue"/>
-                                <Setter Property="BorderBrush" Value="CornflowerBlue"/>
+                                <Setter Property="Background" Value="LightSkyBlue"/>
+                                <Setter Property="BorderBrush" Value="LightSkyBlue"/>
                                 <Setter Property="Foreground" Value="White" />
                             </Trigger>
                         </Style.Triggers>
                         <!-- Add some padding around the contents of a cell -->
+                        <Setter Property="Tag" Value="{Binding IsEditing, RelativeSource={RelativeSource Self}}"/>
                         <Setter Property="Padding" Value="4,3,4,3" />
                         <Setter Property="BorderBrush" Value="Transparent"/>
                         <Setter Property="BorderThickness" Value="1"/>
@@ -114,8 +115,6 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Image Grid.Row="1" x:Name="SplashImage" Source="/logo.gif" Stretch="Uniform" Width="1000" Margin="460,218,460,365" Grid.RowSpan="2"/>
-
         <!--Контур с меню-->
         <Border BorderBrush="Black" CornerRadius="15,15,15,15" Background="White" Margin="5,10,5,5">
             <Menu Background="Transparent" Margin="15,0,21,0">
@@ -127,7 +126,16 @@
                     <MenuItem x:Name="uploadDataBase_menuItem" Header="Загрузить базу данных с другого источника" Click="uploadDataBase_menuItem_Click"></MenuItem>
                     <MenuItem x:Name="downloadDataBaseFromFtp_menuItem" Header="Загрузить базу данных с сервера" Click="downloadDataBaseFromFtp_menuItem_Click"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="ДАННЫЕ" Foreground="#FF585454" FontFamily="Arial Black" ></MenuItem>
+                <MenuItem Header="ДАННЫЕ" Foreground="#FF585454" FontFamily="Arial Black" >
+                    <MenuItem x:Name="exportCalcToPrice_menuItem"
+                              Header="Перенести выбранные строки из расчёта в прайс"
+                              Click="ExportCalcToPrice_button_Click">
+                    </MenuItem>
+                    <MenuItem x:Name="exportAllCalcToPrice_menuItem"
+                              Header="Перенести все строки из расчёта в прайс"
+                              Click="ExportAllCalcToPrice_button_Click">
+                    </MenuItem>
+                </MenuItem>
                 <MenuItem Header="НАСТРОЙКИ" Foreground="#FF585454" FontFamily="Arial Black" >
                     <MenuItem Header="Настройки обновления цен из EXCEL" ></MenuItem>
                     <Separator/>
@@ -948,10 +956,22 @@
                                 Background="#FF50CBFF" 
                                 VerticalAlignment="Top" 
                                 Margin="0,0,5,0" 
-                                ToolTip="Перенести выбранные строки в конец прайса"
+                                ToolTip="Перенести выбранные строки в прайс"
                                 Click="ExportCalcToPrice_button_Click">
 
                             <Image Source="pack://application:,,,/resources/images/exportCalcToPrice.png" Height="32" Width="32" Margin="-25,0,0,0"/>
+                        </Button>
+
+                        <Button  x:Name="ExportAllCalcToPrice_button"
+                                 Template="{StaticResource btTemplate}" 
+                                 Height="40" Width="40"
+                                 Background="#FF50CBFF" 
+                                 VerticalAlignment="Top" 
+                                 Margin="0,0,5,0" 
+                                 ToolTip="Перенести все строки в прайс"
+                                 Click="ExportAllCalcToPrice_button_Click">
+
+                            <!--<Image Source="pack://application:,,,/resources/images/exportCalcToPrice.png" Height="32" Width="32" Margin="-25,0,0,0"/>-->
                         </Button>
 
                         <Button x:Name="CalcChapter_button"
@@ -1035,9 +1055,6 @@
                               MouseDoubleClick="CalcDataGrid_MouseDoubleClick"
                               CellEditEnding="CalcDataGrid_CellEditEnding">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding ID}" Width="1*" MinWidth="30" IsReadOnly="True">
-                            </DataGridTextColumn>
-
                             <DataGridTextColumn Header="№" Binding="{Binding Num, Converter={StaticResource NullToEmptyStringConverter}}" Width="1*" MinWidth="30" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="{x:Type TextBlock}">

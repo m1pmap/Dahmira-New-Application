@@ -43,5 +43,8 @@ namespace Dahmira.Models
         public string PDFFolderPath { get; set; } = "D:\\"; //Папка для сохранения PDF
         public string CalcFolderPath { get; set; } = "D:\\"; //Папка для сохранения расчётки
         public string Price { get; set; } = "|DataDirectory|Dahmira_TestDb.mdf"; //Путь к прайсу
+
+        public List<ColumnInfo> CalcColumnInfos { get; set; } = new List<ColumnInfo>();
+        public List<ColumnInfo> DBColumnInfos { get; set; } = new List<ColumnInfo>();
     }
 }

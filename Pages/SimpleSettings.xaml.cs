@@ -212,12 +212,15 @@ namespace Dahmira.Pages
 
         private void AdministratorPasswordCheck_button_Click(object sender, RoutedEventArgs e) //Проверка введённого пароля администратора
         {
-            if(AdministratorPassword_passwordBox.Password == "Administrator2024") //Если пароль верный
+            if (AdministratorPassword_passwordBox.Password == "Administrator2024") //Если пароль верный
             {
                 AdministratingStatus_label.Content = "вы Администратор";
                 AdministratingStatus_label.Foreground = new SolidColorBrush(Colors.MediumSeaGreen);
                 hideShowButtonColumn.Width = new GridLength(30, GridUnitType.Pixel);
                 settings.IsAdministrator = true;
+                CountryDataGrid.IsReadOnly = false;
+                MyTimer timer = new MyTimer(1800, TimerAction); // Создаем таймер на 10 секунд
+                timer.Start(); // Запускаем таймер
             }
             else
             {
@@ -226,7 +229,20 @@ namespace Dahmira.Pages
                 AdministratingStatus_label.Foreground = new SolidColorBrush(Colors.OrangeRed);
                 hideShowButtonColumn.Width = new GridLength(0, GridUnitType.Star);
                 settings.IsAdministrator = false;
+                CountryDataGrid.IsReadOnly = true;
             }
+        }
+
+        private void TimerAction()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                AdministratingStatus_label.Content = "вы не обладаете правами Администратора";
+                AdministratingStatus_label.Foreground = new SolidColorBrush(Colors.OrangeRed);
+                hideShowButtonColumn.Width = new GridLength(0, GridUnitType.Star);
+                settings.IsAdministrator = false;
+                CountryDataGrid.IsReadOnly = true;
+            });
         }
 
         private void AddPriceFolderPath_button_Click(object sender, RoutedEventArgs e)  //Добавление пути к прайсу

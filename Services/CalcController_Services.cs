@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace Dahmira.Services
 {
@@ -147,8 +148,9 @@ namespace Dahmira.Services
                 }
             }
 
-            CalcGrid.CommitEdit();
+
             calcItems[calcItems.Count - 1].TotalCost = Math.Round(fullCost, 2);
+            CalcGrid.CommitEdit();
             CalcGrid.Items.Refresh();
         }
         public bool AddToCalc(DataGrid DBGrid, DataGrid CalcGrid, MainWindow window, string count = "1", string position = "Last") //Добавление в расчётку товара

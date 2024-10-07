@@ -58,6 +58,8 @@ namespace Dahmira.Services
 
                 }
                 worksheet.Cells[1, lastColumnIndex].Value = "Примечания";
+                worksheet.Cells[1, lastColumnIndex - 1].Value = "Сумма без НДС";
+                worksheet.Cells[1, lastColumnIndex - 3].Value = "Цена без НДС";
 
                 //Установка стилей для Header 
                 ExcelRange titleRange = worksheet.Cells[1, 1, 1, lastColumnIndex];
@@ -170,6 +172,24 @@ namespace Dahmira.Services
                 }
 
                 worksheet.Cells[window.calcItems.Count + 2 - 1, lastColumnIndex - 1].Value = window.settings.FullCostType + " " + window.calcItems[window.calcItems.Count - 1].TotalCost;
+
+                ExcelRange countryRng = worksheet.Cells[window.calcItems.Count + 4 - 1, 1, window.calcItems.Count + 4 - 1, lastColumnIndex];
+                countryRng.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                countryRng.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                countryRng.Style.WrapText = true;
+
+                countryRng.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                countryRng.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                countryRng.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                countryRng.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+                countryRng.Style.Border.Top.Color.SetColor(System.Drawing.Color.Gray);
+                countryRng.Style.Border.Bottom.Color.SetColor(System.Drawing.Color.Gray);
+                countryRng.Style.Border.Left.Color.SetColor(System.Drawing.Color.Gray);
+                countryRng.Style.Border.Right.Color.SetColor(System.Drawing.Color.Gray);
+                countryRng.Merge = true;
+                Country selectedCountry = (Country)window.allCountries_comboBox.SelectedItem;
+                worksheet.Cells[window.calcItems.Count + 4 - 1, 1].Value = $"Цена для: {selectedCountry.name}";
 
                 //Диалоговое окно для сохранения
                 SaveFileDialog saveFileDialog = new SaveFileDialog
@@ -402,6 +422,28 @@ namespace Dahmira.Services
                 {
                     window.settings = JsonSerializer.Deserialize<SettingsParameters>(jsonString);
                 }
+
+                foreach (var columnInfo in window.settings.CalcColumnInfos)
+                {
+                    var column = window.CalcDataGrid.Columns.First(c => c.Header.ToString() == columnInfo.Header);
+                    if (column != null)
+                    {
+                        column.DisplayIndex = columnInfo.DisplayIndex;
+                        column.Width = new DataGridLength(columnInfo.Width);
+                    }
+                }
+
+                foreach (var columnInfo in window.settings.DBColumnInfos)
+                {
+                    var column = window.dataBaseGrid.Columns.First(c => c.Header.ToString() == columnInfo.Header);
+                    if (column != null)
+                    {
+                        column.DisplayIndex = columnInfo.DisplayIndex;
+                        column.Width = new DataGridLength(columnInfo.Width);
+                    }
+                }
+
+                window.settings.IsAdministrator = false;
             }
             catch (Exception exp) 
             {
@@ -413,6 +455,29 @@ namespace Dahmira.Services
         {
             try
             {
+                window.settings.CalcColumnInfos.Clear();
+                window.settings.DBColumnInfos.Clear();
+
+                foreach (var column in window.CalcDataGrid.Columns)
+                {
+                    window.settings.CalcColumnInfos.Add(new ColumnInfo
+                    {
+                        Header = column.Header.ToString(),
+                        DisplayIndex = column.DisplayIndex,
+                        Width = column.ActualWidth
+                    });
+                }
+
+                foreach (var column in window.dataBaseGrid.Columns)
+                {
+                    window.settings.DBColumnInfos.Add(new ColumnInfo
+                    {
+                        Header = column.Header.ToString(),
+                        DisplayIndex = column.DisplayIndex,
+                        Width = column.ActualWidth
+                    });
+                }
+
                 string jsonString = JsonSerializer.Serialize(window.settings);
                 string filePath = "settings.json";
                 File.WriteAllText(filePath, jsonString);

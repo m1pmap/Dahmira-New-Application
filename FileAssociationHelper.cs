@@ -18,7 +18,7 @@ namespace Dahmira
 
             using (RegistryKey key = Registry.CurrentUser.CreateSubKey($@"Software\Classes\{progId}"))
             {
-                key.SetValue("", "Описание вашего приложения");
+                key.SetValue("", "Расчёт Dahmira");
                 key.CreateSubKey("shell").CreateSubKey("open").CreateSubKey("command").SetValue("", $"\"{applicationPath}\" \"%1\"");
             }
         }
