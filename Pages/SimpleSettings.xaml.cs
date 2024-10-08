@@ -170,13 +170,16 @@ namespace Dahmira.Pages
         {
             try
             {
-                Country selectedCountry = (Country)CountryDataGrid.SelectedItem;
-                Manufacturer selectedManufacturer = (Manufacturer)ManufacturerDataGrid.SelectedItem;
-                //Добавление поставщика в те, что не имеют страны
-                var ManufacturerWithoutCountryItemSource = WithoutCountryManufacturersDataGrid.ItemsSource as ObservableCollection<Manufacturer>;
-                ManufacturerWithoutCountryItemSource.Add(selectedManufacturer);
-                //Удаление поставщика из местных поставщиков выбранной страны
-                selectedCountry.manufacturers.Remove(selectedManufacturer);
+                if(settings.IsAdministrator)
+                {
+                    Country selectedCountry = (Country)CountryDataGrid.SelectedItem;
+                    Manufacturer selectedManufacturer = (Manufacturer)ManufacturerDataGrid.SelectedItem;
+                    //Добавление поставщика в те, что не имеют страны
+                    var ManufacturerWithoutCountryItemSource = WithoutCountryManufacturersDataGrid.ItemsSource as ObservableCollection<Manufacturer>;
+                    ManufacturerWithoutCountryItemSource.Add(selectedManufacturer);
+                    //Удаление поставщика из местных поставщиков выбранной страны
+                    selectedCountry.manufacturers.Remove(selectedManufacturer);
+                }
             }
             catch { }
         }
@@ -217,6 +220,7 @@ namespace Dahmira.Pages
                 AdministratingStatus_label.Content = "вы Администратор";
                 AdministratingStatus_label.Foreground = new SolidColorBrush(Colors.MediumSeaGreen);
                 hideShowButtonColumn.Width = new GridLength(30, GridUnitType.Pixel);
+                withoutCountryColumn.Width = new GridLength(0, GridUnitType.Pixel);
                 settings.IsAdministrator = true;
                 CountryDataGrid.IsReadOnly = false;
                 MyTimer timer = new MyTimer(1800, TimerAction); // Создаем таймер на 10 секунд
@@ -228,6 +232,7 @@ namespace Dahmira.Pages
                 AdministratingStatus_label.Content = "вы не обладаете правами Администратора";
                 AdministratingStatus_label.Foreground = new SolidColorBrush(Colors.OrangeRed);
                 hideShowButtonColumn.Width = new GridLength(0, GridUnitType.Star);
+                withoutCountryColumn.Width = new GridLength(0, GridUnitType.Pixel);
                 settings.IsAdministrator = false;
                 CountryDataGrid.IsReadOnly = true;
             }
@@ -378,6 +383,34 @@ namespace Dahmira.Pages
                 if (selectedCountry != null)
                 {
                     CountryManager.Instance.priceManager.countries.Remove(selectedCountry);
+                }
+            }
+        }
+
+        private void HandleDeleteAction()
+        {
+            Country selectedItem = (Country)CountryDataGrid.SelectedItem;
+            if (selectedItem != null) 
+            {
+                CountryManager.Instance.priceManager.countries.Remove(selectedItem);
+            }
+        }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (MyTabControl.SelectedItem is TabItem selectedTab)
+            {
+                if (selectedTab.Header.ToString() == "Менеджер цен")
+                {
+                    if (!settings.IsAdministrator)
+                    {
+                        e.Handled = true;
+                        MessageBox.Show("");
+                    }
+                    else
+                    {
+                        HandleDeleteAction();
+                    }
                 }
             }
         }

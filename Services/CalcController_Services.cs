@@ -38,7 +38,7 @@ namespace Dahmira.Services
                 //Перечисление всех зависимостей и получение результата
                 foreach (var dep in item.dependencies)
                 {
-                    CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ProductName == dep.ProductName);
+                    CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ID == dep.ProductId);
                     if(foundProduct != null)
                     {
                         switch (dep.SelectedType)
@@ -112,7 +112,7 @@ namespace Dahmira.Services
                         }
                         else
                         {
-                            if (item.RowColor == ColorToHex(Colors.CornflowerBlue)) //Если цвет зелёный, то оставляем цвет таким же
+                            if (item.RowColor == ColorToHex(Colors.CornflowerBlue)) //Если цвет Синий, то оставляем цвет таким же
                             {
                                 item.RowColor = ColorToHex(Colors.CornflowerBlue);
                                 item.RowForegroundColor = ColorToHex(Colors.White);

@@ -77,7 +77,9 @@ namespace Dahmira
         {
             InitializeComponent();
 
-           //Указываем в реестре, что формат dah открывается через программу Dahmira + указываем путь программы для дальнейшего запуска файла в реестре
+            System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+
+            //Указываем в реестре, что формат dah открывается через программу Dahmira + указываем путь программы для дальнейшего запуска файла в реестре
             string extension = "dah"; // Укажите ваше расширение
             string progId = "Dahmira";
             string applicationPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -606,6 +608,7 @@ namespace Dahmira
 
         private void CalcdataGrid_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e) //При смене текущего выделенного элемента расчётки
         {
+
             isDependencySelected = false;
             if (CalcDataGrid.SelectedIndex != calcItems.Count - 1)
             {
@@ -626,6 +629,22 @@ namespace Dahmira
                             DependencyImage.Visibility = Visibility.Visible;
                             DependencyDataGrid.Visibility = Visibility.Hidden;
                             DependencyButtons.Visibility = Visibility.Hidden;
+                        }
+                    }
+                    else
+                    {
+                        if (!selectItemForDependencies.dependencies.Any(i => i.ProductId == selectedItem.ID))
+                        {
+                            if (selectedItem != null && selectItemForDependencies != selectedItem && selectedItem.ID != 0) //Если элемент выбран и это не текущий для добавления
+                            {
+                                if (selectItemForDependencies.dependencies.Count == 0) //Если до этого не было зависимостей, то появляется отметка зависимости
+                                {
+                                    selectItemForDependencies.isDependency = true;
+                                }
+                                //Добавление
+                                selectItemForDependencies.dependencies.Add(new Dependency { ProductId = selectedItem.ID, ProductName = selectedItem.ProductName, SelectedType = "*", Multiplier = 1 });
+                                isCalcSaved = false;
+                            }
                         }
                     }
 
@@ -1176,26 +1195,26 @@ namespace Dahmira
 
         private void CalcDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (CalcDataGrid.SelectedIndex != calcItems.Count - 1)
-            {
-                if (isAddtoDependency) //Если сейчас идёт добавление
-                {
-                    CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem; //Текущий выбранный элемент
-                    if (!selectItemForDependencies.dependencies.Any(i => i.ProductId == selectedItem.ID))
-                    {
-                        if (selectedItem != null && selectItemForDependencies != selectedItem && selectedItem.ID != 0) //Если элемент выбран и это не текущий для добавления
-                        {
-                            if (selectItemForDependencies.dependencies.Count == 0) //Если до этого не было зависимостей, то появляется отметка зависимости
-                            {
-                                selectItemForDependencies.isDependency = true;
-                            }
-                            //Добавление
-                            selectItemForDependencies.dependencies.Add(new Dependency {ProductId = selectedItem.ID, ProductName = selectedItem.ProductName, SelectedType = "*", Multiplier = 1 });
-                            isCalcSaved = false;
-                        }
-                    }
-                }
-            }
+            //if (CalcDataGrid.SelectedIndex != calcItems.Count - 1)
+            //{
+            //    if (isAddtoDependency) //Если сейчас идёт добавление
+            //    {
+            //        CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem; //Текущий выбранный элемент
+            //        if (!selectItemForDependencies.dependencies.Any(i => i.ProductId == selectedItem.ID))
+            //        {
+            //            if (selectedItem != null && selectItemForDependencies != selectedItem && selectedItem.ID != 0) //Если элемент выбран и это не текущий для добавления
+            //            {
+            //                if (selectItemForDependencies.dependencies.Count == 0) //Если до этого не было зависимостей, то появляется отметка зависимости
+            //                {
+            //                    selectItemForDependencies.isDependency = true;
+            //                }
+            //                //Добавление
+            //                selectItemForDependencies.dependencies.Add(new Dependency {ProductId = selectedItem.ID, ProductName = selectedItem.ProductName, SelectedType = "*", Multiplier = 1 });
+            //                isCalcSaved = false;
+            //            }
+            //        }
+            //    }
+            //}
 
             //if (e.ChangedButton == MouseButton.Right)
             //{
@@ -1320,11 +1339,12 @@ namespace Dahmira
 
             if (Keyboard.Modifiers == ModifierKeys.Control)
             {
-                if (e.Key == Key.C && CalcDataGrid.IsFocused)
+                if (e.Key == Key.C && IsCellEditing(CalcDataGrid) == 1)
                 {
                     CopyCalc_Click(this, e);
+                    //e.Handled = true;
                 }
-                else if (e.Key == Key.X && CalcDataGrid.IsFocused)
+                else if (e.Key == Key.X && IsCellEditing(CalcDataGrid) == 1)
                 {
                  // Создаем список для хранения выделенных элементов нужного типа
                     List<CalcProduct> selectedItems = new List<CalcProduct>();
@@ -1351,7 +1371,7 @@ namespace Dahmira
                     CalcController.Refresh(CalcDataGrid, calcItems);
                     //e.Handled = true; // Указываем, что событие обработано
                 }
-                else if (e.Key == Key.V && CalcDataGrid.IsFocused)
+                else if (e.Key == Key.V && IsCellEditing(CalcDataGrid) == 1)
                 {
                     //Извлекаем из буфера обмена
                     if (Clipboard.ContainsText())
@@ -1361,6 +1381,7 @@ namespace Dahmira
                             if (isCalcOpened) //Если открыта расчётка то вставляем в расчётку
                             {
                                 PasteCalc_Click(sender, e);
+                                //e.Handled = true;
                             }
                             else //Если открыта не расчётка, то вставляем в основную бд, создав при этом новый элемент
                             {
@@ -1586,11 +1607,23 @@ namespace Dahmira
             {
                 if (selectedItem.ID != 0)
                 {
-                    DependencyImage.Visibility = Visibility.Visible;
-                    DependencyDataGrid.Visibility = Visibility.Hidden;
-                    DependencyButtons.Visibility = Visibility.Hidden;
-                    selectedItem.isDependency = false;
-                    selectedItem.dependencies.Clear();
+                    if (isAddtoDependency)
+                    {
+                        startStopAddingDependency_button_Click(sender, e);
+                        DependencyImage.Visibility = Visibility.Visible;
+                        DependencyDataGrid.Visibility = Visibility.Hidden;
+                        DependencyButtons.Visibility = Visibility.Hidden;
+                        selectItemForDependencies.isDependency = false;
+                        selectItemForDependencies.dependencies.Clear();
+                    }
+                    else
+                    {
+                        DependencyImage.Visibility = Visibility.Visible;
+                        DependencyDataGrid.Visibility = Visibility.Hidden;
+                        DependencyButtons.Visibility = Visibility.Hidden;
+                        selectedItem.isDependency = false;
+                        selectedItem.dependencies.Clear();
+                    }
                     CalcController.Refresh(CalcDataGrid, calcItems);
                 }
             }
@@ -1633,26 +1666,33 @@ namespace Dahmira
 
         private void PasteCalc_Click(object sender, RoutedEventArgs e)
         {
-            var options = new JsonSerializerOptions
+            CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+            if(selectedItem != null) 
             {
-                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-            };
-
-            string json = Clipboard.GetText();
-            var itemsToPaste = JsonSerializer.Deserialize<List<CalcProduct>>(json, options);
-
-            if (itemsToPaste != null)
-            {
-                for (int i = 0; i < itemsToPaste.Count; i++)
+                if(selectedItem.ID != 0 && selectedItem.Manufacturer != string.Empty)
                 {
-                    int MaxId = calcItems.Max(i => i.ID);
-                    itemsToPaste[i].ID = MaxId + 1;
-                    calcItems.Insert(CalcDataGrid.SelectedIndex + 1, itemsToPaste[i]);
+                    var options = new JsonSerializerOptions
+                    {
+                        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+                    };
+
+                    string json = Clipboard.GetText();
+                    var itemsToPaste = JsonSerializer.Deserialize<List<CalcProduct>>(json, options);
+
+                    if (itemsToPaste != null)
+                    {
+                        for (int i = 0; i < itemsToPaste.Count; i++)
+                        {
+                            int MaxId = calcItems.Max(i => i.ID);
+                            itemsToPaste[i].ID = MaxId + 1;
+                            calcItems.Insert(CalcDataGrid.SelectedIndex + 1, itemsToPaste[i]);
+                        }
+                        CalcController.Refresh(CalcDataGrid, calcItems);
+                        CalcInfo_label.Content = "Элементы вставлены из буфера.";
+                        isCalcSaved = false;
+                        //e.Handled = true; // Указываем, что событие обработано
+                    }
                 }
-                CalcController.Refresh(CalcDataGrid, calcItems);
-                CalcInfo_label.Content = "Элементы вставлены из буфера.";
-                isCalcSaved = false;
-                //e.Handled = true; // Указываем, что событие обработано
             }
         }
 
@@ -1732,6 +1772,21 @@ namespace Dahmira
                     selectItemForDependencies = selectedItem; //Запоминаем выделенный элемент
                     isAddtoDependency = true;
                     DependencyDataGrid.ItemsSource = selectedItem.dependencies;
+
+                    if(selectItemForDependencies.dependencies.Count > 0) 
+                    {
+                        foreach (var dependency in selectItemForDependencies.dependencies) //Отображение всех зависимостей
+                        {
+                            CalcProduct foundProduct = calcItems.FirstOrDefault(p => p.ID == dependency.ProductId);
+                            if (foundProduct != null)
+                            {
+                                foundProduct.RowColor = CalcController.ColorToHex(Colors.MediumSeaGreen);
+                                foundProduct.RowForegroundColor = CalcController.ColorToHex(Colors.White);
+                            }
+                        }
+                    }
+
+
                     //Изменение стиля кнопки
                     startStopAddingDependency_button.Background = Brushes.Coral;
                     startStopAddingDependency_image.Source = new BitmapImage(new Uri("resources/images/stop.png", UriKind.Relative));
@@ -1761,14 +1816,33 @@ namespace Dahmira
 
         private void CalcDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
-                if (e.Column.Header.ToString() == "Цена" || e.Column.Header.ToString() == "Количество")
+            if (e.Column.Header.ToString() == "Цена" || e.Column.Header.ToString() == "Количество")
+            {
+                CalcProduct selectedItem = (CalcProduct)CalcDataGrid.SelectedItem;
+                if(selectedItem != null) 
                 {
+                    if(selectedItem.isDependency)
+                    {
+                        var result = MessageBox.Show("Вы точно хотите установить значение количества для строки с зависимостью. Это действие удалит зависимость", "", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                        if(result == MessageBoxResult.No)
+                        {
+                            return;
+                        }
+                    }
+
+                    selectedItem.isDependency = false;
+                    selectedItem.dependencies.Clear();
+
                     string newTex = ((TextBox)e.EditingElement).Text;
 
-
-                    if (string.IsNullOrWhiteSpace(newTex)) //Если текст пустой
+                    if (newTex == "0")
                     {
-                        ((TextBox)e.EditingElement).Text = "0";
+                        MessageBox.Show("Невозмонжно установить 0 в качестве количества");
+                        ((TextBox)e.EditingElement).Text = "1";
+                    }
+                    else if (string.IsNullOrWhiteSpace(newTex)) //Если текст пустой
+                    {
+                        ((TextBox)e.EditingElement).Text = "1";
                     }
                     else
                     {
@@ -1793,7 +1867,7 @@ namespace Dahmira
                         // Если число пустое или состоит только из точки
                         if (string.IsNullOrEmpty(validNumber) || validNumber == ".")
                         {
-                            ((TextBox)e.EditingElement).Text = "0";
+                            ((TextBox)e.EditingElement).Text = "1";
                         }
                         else
                         {
@@ -1801,8 +1875,7 @@ namespace Dahmira
                         }
                     }
                 }
-
-            
+            }            
         }
 
         private void ExportAllCalcToPrice_button_Click(object sender, RoutedEventArgs e)

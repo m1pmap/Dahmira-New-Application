@@ -429,7 +429,6 @@ namespace Dahmira.Services
                     if (column != null)
                     {
                         column.DisplayIndex = columnInfo.DisplayIndex;
-                        column.Width = new DataGridLength(columnInfo.Width);
                     }
                 }
 
@@ -439,7 +438,6 @@ namespace Dahmira.Services
                     if (column != null)
                     {
                         column.DisplayIndex = columnInfo.DisplayIndex;
-                        column.Width = new DataGridLength(columnInfo.Width);
                     }
                 }
 
@@ -464,7 +462,6 @@ namespace Dahmira.Services
                     {
                         Header = column.Header.ToString(),
                         DisplayIndex = column.DisplayIndex,
-                        Width = column.ActualWidth
                     });
                 }
 
@@ -474,7 +471,6 @@ namespace Dahmira.Services
                     {
                         Header = column.Header.ToString(),
                         DisplayIndex = column.DisplayIndex,
-                        Width = column.ActualWidth
                     });
                 }
 

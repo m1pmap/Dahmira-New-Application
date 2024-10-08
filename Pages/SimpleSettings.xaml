@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dahmira.Pages"
         mc:Ignorable="d"
-        Title="Настройки" Height="420" Width="700" MinHeight="300" MinWidth="700" Left="-5" Top="0" ResizeMode="NoResize" Closed="Window_Closed">
+        Title="Настройки" Height="420" Width="700" MinHeight="300" MinWidth="700" Left="-5" Top="0" ResizeMode="NoResize" Closed="Window_Closed" PreviewKeyDown="Window_PreviewKeyDown">
 
     <Window.Resources>
         <!--Стиль для TabControl-->
@@ -149,7 +149,7 @@
     </Window.Resources>
 
     <Grid Background="Gray">
-        <TabControl Margin="10" BorderBrush="#a3a3a4" BorderThickness="0" Padding="10">
+        <TabControl x:Name="MyTabControl" Margin="10" BorderBrush="#a3a3a4" BorderThickness="0" Padding="10">
             <!--Вкладка с общими настройками-->
             <TabItem Header="Общие">
                 <Grid>
