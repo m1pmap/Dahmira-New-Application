@@ -30,6 +30,8 @@
     <None Remove="resources\images\exportCalcToPrice.png" />
     <None Remove="resources\images\fast_search.png" />
     <None Remove="resources\images\ico.ico" />
+    <None Remove="resources\images\moveDown.png" />
+    <None Remove="resources\images\moveUp.png" />
     <None Remove="resources\images\openCalc.png" />
     <None Remove="resources\images\pasteCalc.png" />
     <None Remove="resources\images\play.png" />
@@ -80,6 +82,8 @@
     <Resource Include="resources\images\exportCalcToPrice.png" />
     <Resource Include="resources\images\fast_search.png" />
     <Resource Include="resources\images\ico.ico" />
+    <Resource Include="resources\images\moveDown.png" />
+    <Resource Include="resources\images\moveUp.png" />
     <Resource Include="resources\images\openCalc.png" />
     <Resource Include="resources\images\pasteCalc.png" />
     <Resource Include="resources\images\play.png" />

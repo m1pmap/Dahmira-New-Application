@@ -125,6 +125,8 @@
                     <Separator/>
                     <MenuItem x:Name="uploadDataBase_menuItem" Header="Загрузить базу данных с другого источника" Click="uploadDataBase_menuItem_Click"></MenuItem>
                     <MenuItem x:Name="downloadDataBaseFromFtp_menuItem" Header="Загрузить базу данных с сервера" Click="downloadDataBaseFromFtp_menuItem_Click"></MenuItem>
+                    <Separator/>
+                    <MenuItem x:Name="Templates_menuItem" Header="Шаблоны прайса" Click="templates_menuItem_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="ДАННЫЕ" Foreground="#FF585454" FontFamily="Arial Black" >
                     <MenuItem x:Name="exportCalcToPrice_menuItem"
@@ -387,8 +389,8 @@
 
                     <TextBox x:Name="CountProductToAdd_textBox" Text="1" Grid.Column="4" Margin="0,91,0,47" FontSize="14" Foreground="Gray" FontFamily="Arial Black" Grid.ColumnSpan="3"/>
 
-                    <Image x:Name="productImage"
-                        Margin="14,45,14,20" Source="/resources/images/without_picture.png" Grid.Column="11" Width="132.794157401962" Height="92.008"/>
+                    <Image x:Name="productImage" Margin="14,45,14,20" Source="/resources/images/without_picture.png" Grid.Column="11" Width="132.794157401962" Height="92.008"
+                           MouseDown="productImage_MouseDown"/>
 
                     <Label Content="ИНФОРМАЦИЯ О ТОВАРЕ" 
                            HorizontalAlignment="Center" 
@@ -534,16 +536,16 @@
                         <RowDefinition Height="102.008"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="51"/>
-                        <ColumnDefinition Width="382"/>
-                        <ColumnDefinition Width="520*"/>
-                        <ColumnDefinition Width="609*"/>
+                        <ColumnDefinition Width="433"/>
+                        <ColumnDefinition Width="16*"/>
+                        <ColumnDefinition Width="56"/>
+                        <ColumnDefinition Width="21*"/>
                         <ColumnDefinition Width="161"/>
                         <ColumnDefinition Width="160"/>
                         <ColumnDefinition Width="22"/>
                     </Grid.ColumnDefinitions>
 
-                    <Image x:Name="CalcProductImage" Margin="24,45,4,29" Source="/resources/images/without_picture.png" Grid.RowSpan="2" Grid.Column="4"/>
+                    <Image x:Name="CalcProductImage" Margin="24,45,4,29" Source="/resources/images/without_picture.png" Grid.RowSpan="2" Grid.Column="4" MouseDown="CalcProductImage_MouseDown"/>
 
                     <StackPanel Orientation="Horizontal" Grid.Column="5" VerticalAlignment="Top" Height="40" Margin="7,18,-7,0" Grid.Row="0" Grid.ColumnSpan="2">
                         <Button x:Name="CalcUploadFromFile"
@@ -610,7 +612,7 @@
 
 
 
-                    <StackPanel x:Name="DependencyButtons" Orientation="Vertical" Visibility="Hidden" Grid.RowSpan="2" HorizontalAlignment="Left" Margin="465,30,0,21" Width="40" Grid.Column="2">
+                    <StackPanel x:Name="DependencyButtons" Orientation="Vertical" Visibility="Hidden" Grid.RowSpan="2" HorizontalAlignment="Left" Margin="2,30,0,21" Width="40" Grid.Column="2">
                         <Button x:Name="startStopAddingDependency_button"
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="40"
@@ -635,9 +637,9 @@
                     </StackPanel>
 
 
-                    <DataGrid x:Name="DependencyDataGrid" Margin="10,30,60,19" Visibility="Hidden" 
+                    <DataGrid x:Name="DependencyDataGrid" Margin="10,30,4,19" Visibility="Hidden" 
                               FontFamily="Arial Black" Foreground="Gray" 
-                              RowHeaderWidth="0" Background="White" BorderThickness="1" Grid.RowSpan="2" AutoGenerateColumns="False" CanUserAddRows="False" Grid.ColumnSpan="3"
+                              RowHeaderWidth="0" Background="White" BorderThickness="1" Grid.RowSpan="2" AutoGenerateColumns="False" CanUserAddRows="False" Grid.ColumnSpan="2"
                               SelectedCellsChanged="DependencyDataGrid_SelectedCellsChanged">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Наименование" Binding="{Binding ProductName}" Width="20*" IsReadOnly="True"/>
@@ -661,9 +663,9 @@
                             <DataGridTextColumn Header="Множитель" Binding="{Binding Multiplier}" Width="7*"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Image x:Name="DependencyImage" Margin="-22,30,273,18" Source="/withoutDependency.png" Grid.RowSpan="2" Grid.ColumnSpan="2" RenderTransformOrigin="0.066,0.481"/>
-                    <Label Content="Расчёт зависимостей:" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Width="213" FontSize="14" FontFamily="Arial Black" Foreground="Gray" Grid.ColumnSpan="2"/>
-                    <Label x:Name="MovingLabel" Content="Требуется расчёт!" FontSize="14" FontFamily="Arial Black" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="144,7,0,0">
+                    <Image x:Name="DependencyImage" Margin="-22,30,273,18" Source="/withoutDependency.png" Grid.RowSpan="2" RenderTransformOrigin="0.066,0.481"/>
+                    <Label Content="Расчёт зависимостей:" HorizontalAlignment="Left" Margin="5,7,0,0" VerticalAlignment="Top" Width="213" FontSize="14" FontFamily="Arial Black" Foreground="Gray"/>
+                    <Label x:Name="MovingLabel" Content="Требуется расчёт!" FontSize="14" FontFamily="Arial Black" Foreground="Red" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="195,7,0,0">
                         <Label.RenderTransform>
                             <TranslateTransform x:Name="labelTransform" />
                         </Label.RenderTransform>
@@ -709,7 +711,7 @@
 
             <Grid>
                 <!--Сетка с элементами управления основной БД-->
-                <Grid x:Name="DataBaseGrid_Grid" Margin="0,0,0,0" Visibility="Visible">
+                <Grid x:Name="DataBaseGrid_Grid" Margin="0,0,0,0" Visibility="Hidden">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="61"/>
                         <RowDefinition/>
@@ -723,7 +725,8 @@
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="40"
                                 Background="OrangeRed" 
-                                VerticalAlignment="Top" 
+                                VerticalAlignment="Top"
+                                HorizontalAlignment="Left"
                                 Margin="0,0,5,0" 
                                 ToolTip="Удалить выбранный товар"
                                 Click="deleteSelectedProduct_button_Click">
@@ -758,13 +761,14 @@
                         <Label x:Name="productsCount_label" 
                                Content="из 1" Margin="-2,5" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="16" Height="27"/>
 
-                        <Button
+                        <Button x:Name="FastSearch_button"
                                 Template="{StaticResource btTemplate}" 
                                 Height="40" Width="40"
                                 Background="#FF50CBFF" 
                                 VerticalAlignment="Top" 
                                 Margin="10,0,5,0"
-                                ToolTip="Быстрый поиск">
+                                ToolTip="Быстрый поиск"
+                            Click="FastSearch_button_Click">
 
                             <Image Source="/resources/images/fast_search.png" Height="32" Width="32" Margin="-30,-2,0,0"/>
                         </Button>
@@ -855,10 +859,11 @@
                 </Grid>
 
                 <!--Сетка с элементами управления и dataGrid расчётки-->
-                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,0" Visibility="Hidden">
+                <Grid x:Name="CalcDataGrid_Grid" Margin="0,0,0,0" Visibility="Visible">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="953*"/>
-                        <ColumnDefinition Width="957*"/>
+                        <ColumnDefinition Width="858"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="268"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="61"/>
@@ -866,193 +871,240 @@
                         <RowDefinition Height="25"/>
                     </Grid.RowDefinitions>
 
-                    <StackPanel Margin="10,10,10,10" Grid.Row="0" Orientation="Horizontal" Grid.Column="0">
-                        <Button x:Name="CalcDeleteSelectedProduct_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="OrangeRed" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Удалить выбранный товар"
-                                Click="CalcDeleteSelectedProduct_button_Click">
+                    <Button x:Name="CalcDeleteSelectedProduct_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="OrangeRed" 
+                            VerticalAlignment="Center" 
+                            Margin="10,0,0,0" 
+                            ToolTip="Удалить выбранный товар"
+                            Click="CalcDeleteSelectedProduct_button_Click" HorizontalAlignment="Left">
 
-                            <Image Source="/resources/images/delete_image.png" Height="32" Width="32" Margin="-30,0,0,0"/>
-                        </Button>
+                        <Image Source="/resources/images/delete_image.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="CalcRefresh_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="MediumSeaGreen" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Обновить ценники в расчетке"
-                                Click="CalcRefresh_button_Click">
+                    <Button x:Name="CalcRefresh_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="MediumSeaGreen" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="55,0,0,0" 
+                            ToolTip="Обновить ценники в расчетке"
+                            Click="CalcRefresh_button_Click">
 
-                            <Image Source="pack://application:,,,/resources/images/refresh.png" Height="32" Width="32" Margin="-30,0,0,0"/>
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/refresh.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="Calc_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="MediumSeaGreen" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Расчёт"
-                                Click="Calc_button_Click">
+                    <Button x:Name="Calc_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="MediumSeaGreen" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="100,0,0,0" 
+                            ToolTip="Расчёт"
+                            Click="Calc_button_Click">
 
-                            <Image Source="pack://application:,,,/resources/images/calc.png" Height="32" Width="32" Margin="-30,0,0,0"/>
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/calc.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="AddDependency_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="MediumSeaGreen" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Создать зависимость"
-                                Click="AddDependency_button_Click">
+                    <Button x:Name="MoveUp_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="MediumSeaGreen" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="145,0,0,0" 
+                            ToolTip="Перенести выбранную позицию выше"
+                            Click="MoveUp_button_Click">
 
-                            <Image Source="pack://application:,,,/resources/images/addDependency.png" Height="32" Width="32" Margin="-30,0,0,0"/>
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/moveUp.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="DeleteDependency_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="Gray" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Удалить зависимость" Click="DeleteDependency_button_Click_1">
+                    <Button x:Name="MoveDown_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="MediumSeaGreen" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="190,0,0,0" 
+                            ToolTip="Перенести выбранную позицию ниже"
+                            Click="MoveDown_button_Click">
 
-                            <Image Source="pack://application:,,,/resources/images/deleteDependency.png" Height="32" Width="32" Margin="-30,0,0,0"/>
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/moveDown.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="CopyCalc"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="MediumSeaGreen" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Копировать выделенные товары"
-                                Click="CopyCalc_Click">
+                    <Button x:Name="AddDependency_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="MediumSeaGreen" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="235,0,0,0"  
+                            ToolTip="Создать зависимость"
+                            Click="AddDependency_button_Click">
 
-                            <Image Source="pack://application:,,,/resources/images/copyCalc.png" Height="32" Width="32" Margin="-30,0,0,0"/>
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/addDependency.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="PasteCalc"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="MediumSeaGreen" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Вставить товары"
-                                Click="PasteCalc_Click">
+                    <Button x:Name="DeleteDependency_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="Gray" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="280,0,0,0" 
+                            ToolTip="Удалить зависимость" Click="DeleteDependency_button_Click_1">
 
-                            <Image Source="pack://application:,,,/resources/images/pasteCalc.png" Height="32" Width="32" Margin="-30,0,0,0"/>
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/deleteDependency.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="ExportCalcToPrice_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="#FF50CBFF" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Перенести выбранные строки в прайс"
-                                Click="ExportCalcToPrice_button_Click">
+                    <Button x:Name="CopyCalc"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="MediumSeaGreen" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="325,0,0,0" 
+                            ToolTip="Копировать выделенные товары"
+                            Click="CopyCalc_Click">
 
-                            <Image Source="pack://application:,,,/resources/images/exportCalcToPrice.png" Height="32" Width="32" Margin="-25,0,0,0"/>
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/copyCalc.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button  x:Name="ExportAllCalcToPrice_button"
-                                 Template="{StaticResource btTemplate}" 
-                                 Height="40" Width="40"
-                                 Background="#FF50CBFF" 
-                                 VerticalAlignment="Top" 
-                                 Margin="0,0,5,0" 
-                                 ToolTip="Перенести все строки в прайс"
-                                 Click="ExportAllCalcToPrice_button_Click">
+                    <Button x:Name="PasteCalc"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="MediumSeaGreen" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="370,0,0,0" 
+                            ToolTip="Вставить товары"
+                            Click="PasteCalc_Click">
 
-                            <!--<Image Source="pack://application:,,,/resources/images/exportCalcToPrice.png" Height="32" Width="32" Margin="-25,0,0,0"/>-->
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/pasteCalc.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="CalcChapter_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="#FF50CBFF" 
-                                VerticalAlignment="Top" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Создать раздел"
-                                Click="CalcChapter_button_Click">
+                    <Button x:Name="ExportCalcToPrice_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="#FF50CBFF" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="415,0,0,0" 
+                            ToolTip="Перенести выбранные строки в прайс"
+                            Click="ExportCalcToPrice_button_Click">
 
-                            <Image Source="pack://application:,,,/resources/images/chapter.png" Height="32" Width="32" Margin="-30,0,0,0"/>
-                        </Button>
+                        <Image Source="pack://application:,,,/resources/images/exportCalcToPrice.png" Height="32" Width="32" Margin="-25,0,0,0"/>
+                    </Button>
 
-                        <Label  Content="ИМЯ РАЗДЕЛА:" Margin="-2,5" FontFamily="Arial Black" Width="Auto" Foreground="Gray" FontSize="16" Height="27"/>
+                    <Button  x:Name="ExportAllCalcToPrice_button"
+                             Template="{StaticResource btTemplate}" 
+                             Height="40" Width="40"
+                             Background="#FF50CBFF" 
+                             VerticalAlignment="Center" 
+                             HorizontalAlignment="Left"
+                             Margin="460,0,0,0" 
+                             ToolTip="Перенести все строки в прайс"
+                             Click="ExportAllCalcToPrice_button_Click">
 
-                        <TextBox x:Name="chapterName_textBox" Text="Раздел"
-                                 Width="Auto" 
-                                 Margin="0,11,5,9" 
-                                 BorderBrush="White" 
-                                 FontFamily="Arial Black" 
-                                 Foreground="Gray" 
-                                 FontSize="16" 
-                                 VerticalContentAlignment="Center"
-                                 MinWidth="18"
-                                 KeyDown="productNum_textBox_KeyDown"/>
+                        <!--<Image Source="pack://application:,,,/resources/images/exportCalcToPrice.png" Height="32" Width="32" Margin="-25,0,0,0"/>-->
+                    </Button>
 
-                        <Border x:Name="CalcWarningBorder" Width="auto" Background="Transparent" CornerRadius="12">
-                            <Label x:Name="CalcWarningLabel" Margin="5,0,5,0" Content="Для начала произведите расчёт" FontSize="14" FontFamily="Arial Black" VerticalAlignment="Center" Foreground="White"/>
-                        </Border>
-                    </StackPanel>
+                    <Button x:Name="CalcChapter_button"
+                            Template="{StaticResource btTemplate}" 
+                            Height="40" Width="40"
+                            Background="#FF50CBFF" 
+                            VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="505,0,0,0" 
+                            ToolTip="Создать раздел"
+                            Click="CalcChapter_button_Click">
 
-                    <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="0,10,10,10" HorizontalAlignment="Right" Width="Auto">
+                        <Image Source="pack://application:,,,/resources/images/chapter.png" Height="32" Width="32" Margin="-30,0,0,0"/>
+                    </Button>
 
-                        <Button x:Name="saveCalc_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="MediumSeaGreen" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Сохранить расчёт"
-                                Click="saveCaalc_menuItem_Click">
+                    <Label  Content="ИМЯ РАЗДЕЛА:" VerticalAlignment="Center" 
+                            HorizontalAlignment="Left"
+                            Margin="550,0,0,0"  FontFamily="Arial Black" Width="147" Foreground="Gray" FontSize="16" Height="27"/>
 
-                            <Image Source="pack://application:,,,/resources/images/save.png" Height="31" Width="31" VerticalAlignment="Top" Margin="-30,0,0,0"/>
-                        </Button>
+                    <TextBox x:Name="chapterName_textBox" Text="Раздел" Background="Transparent"
+                             Width="72" 
+                             VerticalAlignment="Center" 
+                             HorizontalAlignment="Left"
+                             Margin="700,0,0,0"
+                             BorderBrush="White" 
+                             FontFamily="Arial Black" 
+                             Foreground="Gray" 
+                             FontSize="16" 
+                             VerticalContentAlignment="Center"
+                             MinWidth="18"
+                             KeyDown="productNum_textBox_KeyDown" Height="21"/>
 
-                        <Button x:Name="openCalc_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="40"
-                                Background="MediumSeaGreen" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Загрузить расчёт"
-                                Click="openCalc_menuItem_Click">
+                    <Border x:Name="CalcWarningBorder" Width="auto" Background="Transparent" CornerRadius="12" Margin="0,10,5,10" Grid.Column="1" HorizontalAlignment="Right">
+                        <Label x:Name="CalcWarningLabel"
+                            HorizontalAlignment="Center"
+                            Margin="5,0,5,0" Content="Для начала произведите расчёт" FontSize="14" FontFamily="Arial Black" VerticalAlignment="Center" Foreground="White"/>
+                    </Border>
 
-                            <Image Source="pack://application:,,,/resources/images/openCalc.png" Height="30" Width="30" VerticalAlignment="Top" Margin="-27,0,0,0"/>
-                        </Button>
+                    <Button x:Name="newCalc_button" Grid.Column="2"
+                            Template="{StaticResource btTemplate}" Width="40"
+                            Background="MediumSeaGreen" 
+                            Margin="1,10,0,11" 
+                            ToolTip="Пересоздать расчёт"
+                            Click="newCalc_menuItem_Click" HorizontalAlignment="Left">
 
-                        <Button x:Name="CalcToExcel_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="60"
-                                Background="MediumSeaGreen" 
-                                Margin="0,0,5,0" 
-                                ToolTip="Экспортировать в Excel"
-                                Click="CalcToExcel_button_Click">
+                        <!--<Image Source="" Height="31" Width="31" VerticalAlignment="Top" Margin="-30,0,0,0"/>-->
+                    </Button>
 
-                            <Image Source="pack://application:,,,/resources/images/calcToExcel.png" Height="30" Width="50" VerticalAlignment="Top" Margin="-30,0,0,0"/>
-                        </Button>
-                        <Button x:Name="CalcToNewSheetExcel_button"
-                                Template="{StaticResource btTemplate}" 
-                                Height="40" Width="60"
-                                Background="MediumSeaGreen" 
-                                ToolTip="Экспортировать в Excel новым листом"
-                                Click="CalcToNewSheetExcel_button_Click">
+                    <Button x:Name="saveCalc_button" Grid.Column="2"
+                            Template="{StaticResource btTemplate}" Width="40"
+                            Background="MediumSeaGreen" 
+                            Margin="46,10,0,11" 
+                            ToolTip="Сохранить расчёт"
+                            Click="saveCaalc_menuItem_Click" HorizontalAlignment="Left">
 
-                            <Image Source="pack://application:,,,/resources/images/calcToNewSheetExcel.png" Height="30" Width="50" VerticalAlignment="Top" Margin="-30,0,0,0"/>
-                        </Button>
-                    </StackPanel>
+                        <Image Source="pack://application:,,,/resources/images/save.png" Height="31" Width="31" VerticalAlignment="Top" Margin="-30,0,0,0"/>
+                    </Button>
+
+                    <Button x:Name="openCalc_button" Grid.Column="2"
+                            Template="{StaticResource btTemplate}" Width="40"
+                            Background="MediumSeaGreen" 
+                            HorizontalAlignment="Left"
+                            Margin="91,10,0,11" 
+                            ToolTip="Загрузить расчёт"
+                            Click="openCalc_menuItem_Click">
+
+                        <Image Source="pack://application:,,,/resources/images/openCalc.png" Height="30" Width="30" VerticalAlignment="Top" Margin="-27,0,0,0"/>
+                    </Button>
+
+                    <Button x:Name="CalcToExcel_button" Grid.Column="2"
+                            Template="{StaticResource btTemplate}" Width="60"
+                            Background="MediumSeaGreen" 
+                            HorizontalAlignment="Left"
+                            Margin="136,10,0,11"  
+                            ToolTip="Экспортировать в Excel"
+                            Click="CalcToExcel_button_Click">
+
+                        <Image Source="pack://application:,,,/resources/images/calcToExcel.png" Height="30" Width="50" VerticalAlignment="Top" Margin="-30,0,0,0"/>
+                    </Button>
+                    <Button x:Name="CalcToNewSheetExcel_button" Grid.Column="2"
+                            Template="{StaticResource btTemplate}" Width="60"
+                            Background="MediumSeaGreen" 
+                            ToolTip="Экспортировать в Excel новым листом"
+                            HorizontalAlignment="Left"
+                            Margin="201,10,0,11"
+                            Click="CalcToNewSheetExcel_button_Click">
+
+                        <Image Source="pack://application:,,,/resources/images/calcToNewSheetExcel.png" Height="30" Width="50" VerticalAlignment="Top" Margin="-30,0,0,0"/>
+                    </Button>
+
                     <DataGrid x:Name="CalcDataGrid" Grid.Row="1" AutoGenerateColumns="False" Margin="5,0,5,0" Background="White" Foreground="Black" FontFamily="Arial" 
                               CanUserAddRows="False" HorizontalScrollBarVisibility="Disabled" RowHeaderWidth="0" MinRowHeight="20" SelectionMode="Extended"
                               SelectedCellsChanged="CalcdataGrid_SelectedCellsChanged"
-                              CurrentCellChanged="CalcDataGrid_CurrentCellChanged" Grid.ColumnSpan="2"
-                              CellEditEnding="CalcDataGrid_CellEditEnding">
+                              CurrentCellChanged="CalcDataGrid_CurrentCellChanged"
+                              CellEditEnding="CalcDataGrid_CellEditEnding" Grid.ColumnSpan="3">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="№" Binding="{Binding Num, Converter={StaticResource NullToEmptyStringConverter}}" Width="1*" MinWidth="30" IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
@@ -1136,8 +1188,8 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
 
-                            <!--<DataGridTextColumn Header="ID"  Binding="{Binding ID, Converter={StaticResource NullToEmptyStringConverter}}" Width="2*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
-                            <DataGridTextColumn Header="ID Art."  Binding="{Binding ID_Art, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>-->
+                            <DataGridTextColumn Header="ID"  Binding="{Binding ID, Converter={StaticResource NullToEmptyStringConverter}}" Width="2*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>
+                            <!--<DataGridTextColumn Header="ID Art."  Binding="{Binding ID_Art, Converter={StaticResource NullToEmptyStringConverter}}" Width="5*" MinWidth="50" IsReadOnly="True"></DataGridTextColumn>-->
                             <DataGridTextColumn Header="Примечание"  Binding="{Binding Note}" Width="9*" MinWidth="100" IsReadOnly="False" >
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -1164,12 +1216,12 @@
                     <Label  x:Name="CalcInfo_label" Content="Вы находитесь в расчёте."
                             Grid.Row="2"
                             FontFamily="Arial Black"
-                            Foreground="Gray" FontSize="14" HorizontalContentAlignment="Stretch" Margin="5,0,10,-2"/>
+                            Foreground="Gray" FontSize="14" HorizontalContentAlignment="Stretch" Margin="5,0,129,-2" Grid.RowSpan="2" />
 
                     <Label  x:Name="CalcPath_label" Content="Имя файла расчёта: - "
-                            Grid.Row="2" Grid.Column="1"
+                            Grid.Row="2"
                             FontFamily="Arial Black"
-                            Foreground="Gray" FontSize="14" HorizontalContentAlignment="Right" Margin="10,0,5,-2"/>
+                            Foreground="Gray" FontSize="14" HorizontalContentAlignment="Right" Margin="105,0,5,-2" Grid.RowSpan="2" Grid.Column="1" Grid.ColumnSpan="2"/>
                 </Grid>
             </Grid>
         </Border>

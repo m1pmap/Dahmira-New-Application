@@ -21,7 +21,7 @@ namespace Dahmira.Interfaces
         Color HexToColor(string hex);
         void UpdateCellStyle(DataGrid dataGrid, Brush backgroundColor, Brush foregroundColor); //Изменение стиля для DataGrid
         bool ArePhotosEqual(byte[] photo1, byte[] photo2);
-        void CheckingDifferencesWithDB(DataGrid CalcDataGrid, MainWindow window);
+        bool CheckingDifferencesWithDB(DataGrid CalcDataGrid, MainWindow window);
         void Calculation(MainWindow window);
         void ClearBackgroundsColors(MainWindow window);
     }

@@ -354,7 +354,7 @@ namespace Dahmira.Services
             return true;
         }
 
-        void ICalcController.CheckingDifferencesWithDB(DataGrid CalcDataGrid, MainWindow window) //Проверка идентичности данных в БД и расчетке
+        bool ICalcController.CheckingDifferencesWithDB(DataGrid CalcDataGrid, MainWindow window) //Проверка идентичности данных в БД и расчетке
         {
             bool isDifferent = false; //Указвает на присутствие отличий в фото
             //bool isRemovedOnDB = false; //Указвает на то, есть ли элементы, которых нет в бд
@@ -414,14 +414,17 @@ namespace Dahmira.Services
                     }
                 }
                 CalcDataGrid.Items.Refresh();
-                window.CalcInfo_label.Content = "Нарушено соответствие с Базой Данных.";
+                
             }
 
             if (!isDifferent) 
             {
-                MessageBox.Show("Соответствие с Базой Данных не нарушена", "", MessageBoxButton.OK, MessageBoxImage.Information);
                 window.CalcInfo_label.Content = "Соответствие с Базой Данных не нарушена.";
-            }
+                return true;
+            }    
+            
+            window.CalcInfo_label.Content = "Нарушено соответствие с Базой Данных.";
+            return false;
         }
 
         public void Calculation(MainWindow window)

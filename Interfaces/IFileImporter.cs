@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Dahmira.Models;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,5 +23,12 @@ namespace Dahmira.Interfaces
 
 
         public void ImportCalcFromFile_StartDUH(string path, MainWindow window); //Испорт расчётки при запске dah файла
+        void ExportCalcToTemlates(MainWindow window, string patch); //Экспорт расчётки в шаблон
+        ObservableCollection<CalcProduct> Get_JsonList(string path, MainWindow window);//Возвращаем массив данных после десериализации из json
+
+
+        //Такое себе решеиме, нужно подумать будет
+        public List<string> GetFileListFromFtp();
+        public async Task DownloadFileAsync(string ftpServerUrl, string localFilePath) { }
     }
 }

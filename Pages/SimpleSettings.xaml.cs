@@ -375,18 +375,6 @@ namespace Dahmira.Pages
             }
         }
 
-        private void CountryDataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Delete) // Проверяем, нажата ли клавиша Delete
-            {
-                Country selectedCountry = (Country)CountryDataGrid.SelectedItem;
-                if (selectedCountry != null)
-                {
-                    CountryManager.Instance.priceManager.countries.Remove(selectedCountry);
-                }
-            }
-        }
-
         private void HandleDeleteAction()
         {
             Country selectedItem = (Country)CountryDataGrid.SelectedItem;
@@ -398,18 +386,24 @@ namespace Dahmira.Pages
 
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (MyTabControl.SelectedItem is TabItem selectedTab)
+            if (e.Key == Key.Delete)
             {
-                if (selectedTab.Header.ToString() == "Менеджер цен")
+                //Проверяем, что строка не последняя
+                if (CountryDataGrid.SelectedIndex < (CountryDataGrid.Items.Count - 1))
                 {
-                    if (!settings.IsAdministrator)
+                    if (MyTabControl.SelectedItem is TabItem selectedTab)
                     {
-                        e.Handled = true;
-                        MessageBox.Show("");
-                    }
-                    else
-                    {
-                        HandleDeleteAction();
+                        if (selectedTab.Header.ToString() == "Менеджер цен")
+                        {
+                            if (!settings.IsAdministrator)
+                            {
+                                e.Handled = true;
+                            }
+                            else
+                            {
+                                HandleDeleteAction();
+                            }
+                        }
                     }
                 }
             }

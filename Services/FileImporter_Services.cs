@@ -691,5 +691,104 @@ namespace Dahmira.Services
 
             }
         }
+
+        //Экспорт расчётки в шаблон
+        void IFileImporter.ExportCalcToTemlates(MainWindow window, string patch)
+        {
+            if (window.calcItems.Count > 0)
+            {
+                var options = new JsonSerializerOptions
+                {
+                    NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+                };
+
+                string jsonString = JsonSerializer.Serialize(window.calcItems, options);
+
+                window.CalcPath_label.Content = $"Имя файла расчёта: {Path.GetFileName(patch)}";
+                File.WriteAllText(patch, jsonString);
+            }
+        }
+
+
+        //Возвращаем массив данных после десериализации из json
+        ObservableCollection<CalcProduct> IFileImporter.Get_JsonList(string path, MainWindow window)
+        {
+
+
+            string filePath = path;
+            window.CalcPath_label.Content = $"Имя файла расчёта: {Path.GetFileName(filePath)}";
+            string jsonString = File.ReadAllText(filePath);
+            var options = new JsonSerializerOptions
+            {
+                NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals
+            };
+
+            var newItems = JsonSerializer.Deserialize<ObservableCollection<CalcProduct>>(jsonString, options);
+            return newItems;
+        }
+
+
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        //           Загрузка Шаблонов
+        //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Получение списка файлов на FTP-сервере
+        List<string> IFileImporter.GetFileListFromFtp()
+        {
+            List<string> files = new List<string>();
+
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + "/data_price_test/Шаблоны/");
+            request.Method = WebRequestMethods.Ftp.ListDirectory;
+            request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+
+
+            try
+            {
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (line.EndsWith("dah", StringComparison.OrdinalIgnoreCase))
+                        {
+                            files.Add(line);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                //LB_info.Content = "FTP не доступен!";
+                //LB_info.Foreground = new SolidColorBrush(Colors.DarkGoldenrod);
+                MessageBox.Show("FTP сервер временно не доступен! Попробуйте позже!");
+
+                //DownloadProgressBar.Visibility = Visibility.Hidden;
+            }
+            return files;
+        }
+
+        // Асинхронное скачивание файла с FTP-сервера
+        async Task IFileImporter.DownloadFileAsync(string ftpServerUrl, string localFilePath)
+        {
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(url_praise + "/data_price_test/Шаблоны/" + ftpServerUrl);
+            request.Method = WebRequestMethods.Ftp.DownloadFile;
+            request.Credentials = new NetworkCredential(ftpUsername, ftpPassword);
+
+            using (FtpWebResponse response = (FtpWebResponse)await request.GetResponseAsync())
+            using (Stream responseStream = response.GetResponseStream())
+            using (FileStream localFileStream = new FileStream(localFilePath, FileMode.Create))
+            {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = await responseStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    await localFileStream.WriteAsync(buffer, 0, bytesRead);
+                }
+            }
+        }
+
+
+
     }
 }

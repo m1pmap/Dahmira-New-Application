@@ -32,7 +32,7 @@ namespace Dahmira.Models
 
         public CalcProduct Clone()
         {
-                                     
+
             return new CalcProduct
             {
                 ID = this.ID,
@@ -50,8 +50,8 @@ namespace Dahmira.Models
                 Note = this.Note,
                 RowColor = "#FFFFFF",
                 RowForegroundColor = "#000000",
-                isDependency = false,
-                dependencies = new ObservableCollection<Dependency>(), 
+                isDependency = this.isDependency,
+                dependencies = this.dependencies 
             };
         }
     }
